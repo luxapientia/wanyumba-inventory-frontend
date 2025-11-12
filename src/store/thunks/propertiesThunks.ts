@@ -13,7 +13,7 @@ import type {
 } from '../../api/types.js';
 
 /**
- * Fetch properties from the backend with current filters, sorting, and pagination
+ * Fetch properties from the backend with current filters, sorting, search, and pagination
  */
 export const fetchProperties = createAsyncThunk(
   'properties/fetch',
@@ -21,20 +21,23 @@ export const fetchProperties = createAsyncThunk(
     dispatch(setLoading(true));
     try {
       const state = getState() as RootState;
-      const { page, limit, filters } = state.properties;
+      const { page, limit, filters, sortBy, sortOrder, search } = state.properties;
 
-      // Build filters object
+      // Build filters object with all current state values
       const filtersToSend: typeof filters = {
         ...filters,
         page,
         limit,
+        sortBy,
+        sortOrder,
+        search: search || undefined,
       };
 
       const response = await propertiesService.getProperties(filtersToSend);
 
       dispatch(
         setProperties({
-          listings: response.listings,
+          listings: response.properties,
           total: response.pagination.total,
           page: response.pagination.page,
           limit: response.pagination.limit,

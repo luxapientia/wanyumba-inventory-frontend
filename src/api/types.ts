@@ -142,6 +142,9 @@ export interface PropertyFilters {
   ownerId?: string;
   page?: number;
   limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  search?: string;
 }
 
 // Pagination Response
@@ -154,7 +157,7 @@ export interface PaginationMeta {
 
 // Properties Response
 export interface PropertiesResponse {
-  listings: RealEstateProperty[];
+  properties: RealEstateProperty[];
   pagination: PaginationMeta;
 }
 

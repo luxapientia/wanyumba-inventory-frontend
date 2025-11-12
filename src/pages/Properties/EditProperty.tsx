@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft,
@@ -33,7 +33,7 @@ import Button from '../../components/UI/Button.js';
 import Input from '../../components/UI/Input.js';
 import { useToast } from '../../contexts/index.js';
 import propertiesService from '../../api/properties.service.js';
-import type { CreatePropertyDto, ScrapedProperty } from '../../api/types.js';
+import type { CreatePropertyDto, RealEstateProperty } from '../../api/types.js';
 
 const PROPERTY_TYPES = [
   'House',
@@ -56,110 +56,57 @@ const OWNER_TYPES = ['Owner', 'Agent', 'Developer'];
 
 const CURRENCIES = ['TZS', 'USD', 'EUR'];
 
-// Helper function to map ScrapedProperty to CreatePropertyDto
-const mapScrapedPropertyToFormData = (scraped: ScrapedProperty): Partial<CreatePropertyDto> => {
-  // Map listing type (rent/sale to Rent/Sale)
-  const listingType = scraped.listingType
-    ? scraped.listingType.charAt(0).toUpperCase() + scraped.listingType.slice(1).toLowerCase()
-    : '';
-
-  // Map currency (TSh to TZS, etc.)
-  const currency = scraped.priceCurrency
-    ? scraped.priceCurrency.replace('TSh', 'TZS').replace('Tsh', 'TZS').toUpperCase()
-    : 'TZS';
-
-  // Map property type - normalize to match common types or capitalize properly
-  let propertyType = scraped.propertyType || '';
-  if (propertyType) {
-    // Normalize: capitalize first letter, lowercase the rest
-    propertyType = propertyType.charAt(0).toUpperCase() + propertyType.slice(1).toLowerCase();
-    
-    // Check if it matches any common property type (case-insensitive)
-    const matchedType = PROPERTY_TYPES.find(
-      (type) => type.toLowerCase() === propertyType.toLowerCase()
-    );
-    if (matchedType) {
-      propertyType = matchedType; // Use the exact format from PROPERTY_TYPES
-    }
-  }
-
-  return {
-    title: scraped.title || '',
-    description: scraped.description || '',
-    propertyType: propertyType,
-    listingType: listingType,
-    price: scraped.price || 0,
-    currency: currency,
-    bedrooms: scraped.bedrooms ?? undefined,
-    bathrooms: scraped.bathrooms ?? undefined,
-    size: scraped.livingAreaSqm ?? undefined,
-    landSize: scraped.landAreaSqm ?? undefined,
-    address: scraped.addressText || '',
-    district: scraped.district || '',
-    region: scraped.region || scraped.city || '',
-    latitude: scraped.latitude ?? undefined,
-    longitude: scraped.longitude ?? undefined,
-    contactName: scraped.agentName || '',
-    contactPhone: scraped.agentPhone || scraped.agentWhatsapp || '',
-    contactEmail: scraped.agentEmail || '',
-  };
+// Image type for managing existing and new images
+type ImageItem = {
+  id?: string; // Media ID for existing images
+  file?: File; // New file upload
+  preview: string; // Preview URL
+  isExisting?: boolean; // Whether it's an existing image from DB
 };
 
-export default function AddProperty() {
+export default function EditProperty() {
   const navigate = useNavigate();
-  const location = useLocation();
+  const { id } = useParams<{ id: string }>();
   const toast = useToast();
   const [loading, setLoading] = useState(false);
+  const [loadingProperty, setLoadingProperty] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [property, setProperty] = useState<RealEstateProperty | null>(null);
 
-  // Get scraped property from navigation state
-  const scrapedProperty = (location.state as { scrapedProperty?: ScrapedProperty })?.scrapedProperty;
-
-  // Initialize form data with scraped property if available
-  const getInitialFormData = (): CreatePropertyDto => {
-    const baseData: CreatePropertyDto = {
-      title: '',
-      description: '',
-      propertyType: '',
-      listingType: '',
-      price: 0,
-      currency: 'TZS',
-      bedrooms: undefined,
-      bathrooms: undefined,
-      size: undefined,
-      landSize: undefined,
-      floor: undefined,
-      totalFloors: undefined,
-      yearBuilt: undefined,
-      address: '',
-      district: '',
-      region: '',
-      ward: '',
-      latitude: undefined,
-      longitude: undefined,
-      features: undefined,
-      ownerId: 'temp-owner-id', // TODO: Get from auth when available
-      ownerType: 'Owner',
-      contactName: '',
-      contactPhone: '',
-      contactEmail: '',
-      expiresAt: undefined,
-    };
-
-    if (scrapedProperty) {
-      const mappedData = mapScrapedPropertyToFormData(scrapedProperty);
-      return { ...baseData, ...mappedData };
-    }
-
-    return baseData;
-  };
-
-  const [formData, setFormData] = useState<CreatePropertyDto>(getInitialFormData());
+  const [formData, setFormData] = useState<CreatePropertyDto>({
+    title: '',
+    description: '',
+    propertyType: '',
+    listingType: '',
+    price: 0,
+    currency: 'TZS',
+    bedrooms: undefined,
+    bathrooms: undefined,
+    size: undefined,
+    landSize: undefined,
+    floor: undefined,
+    totalFloors: undefined,
+    yearBuilt: undefined,
+    address: '',
+    district: '',
+    region: '',
+    ward: '',
+    latitude: undefined,
+    longitude: undefined,
+    features: undefined,
+    ownerId: 'temp-owner-id',
+    ownerType: 'Owner',
+    contactName: '',
+    contactPhone: '',
+    contactEmail: '',
+    expiresAt: undefined,
+  });
 
   const [showCustomFeatureForm, setShowCustomFeatureForm] = useState<boolean>(false);
   const [customFeatureKey, setCustomFeatureKey] = useState<string>('');
   const [customFeatureValue, setCustomFeatureValue] = useState<string>('');
-  const [images, setImages] = useState<{ file: File; preview: string }[]>([]);
+  const [images, setImages] = useState<ImageItem[]>([]);
+  const [removedImageIds, setRemovedImageIds] = useState<string[]>([]);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [showPropertyTypeOptions, setShowPropertyTypeOptions] = useState<boolean>(false);
 
@@ -175,6 +122,69 @@ export default function AddProperty() {
     { key: 'kitchen', label: 'Kitchen', icon: UtensilsCrossed, color: 'orange' },
     { key: 'gym', label: 'Gym', icon: Dumbbell, color: 'pink' },
   ];
+
+  // Load property data
+  useEffect(() => {
+    const loadProperty = async () => {
+      if (!id) {
+        setError('Property ID is required');
+        setLoadingProperty(false);
+        return;
+      }
+
+      try {
+        setLoadingProperty(true);
+        const propertyData = await propertiesService.getPropertyById(id);
+        setProperty(propertyData);
+
+        // Populate form data
+        setFormData({
+          title: propertyData.title || '',
+          description: propertyData.description || '',
+          propertyType: propertyData.propertyType || '',
+          listingType: propertyData.listingType || '',
+          price: propertyData.price || 0,
+          currency: propertyData.currency || 'TZS',
+          bedrooms: propertyData.bedrooms ?? undefined,
+          bathrooms: propertyData.bathrooms ?? undefined,
+          size: propertyData.size ?? undefined,
+          landSize: propertyData.landSize ?? undefined,
+          floor: propertyData.floor ?? undefined,
+          totalFloors: propertyData.totalFloors ?? undefined,
+          yearBuilt: propertyData.yearBuilt ?? undefined,
+          address: propertyData.address || '',
+          district: propertyData.district || '',
+          region: propertyData.region || '',
+          ward: propertyData.ward || '',
+          latitude: propertyData.latitude ?? undefined,
+          longitude: propertyData.longitude ?? undefined,
+          features: propertyData.features as Record<string, unknown> | undefined,
+          ownerId: propertyData.ownerId || 'temp-owner-id',
+          ownerType: propertyData.ownerType || 'Owner',
+          contactName: propertyData.contactName || '',
+          contactPhone: propertyData.contactPhone || '',
+          contactEmail: propertyData.contactEmail || '',
+          expiresAt: propertyData.expiresAt ? new Date(propertyData.expiresAt).toISOString().slice(0, 16) : undefined,
+        });
+
+        // Load existing images
+        if (propertyData.media && propertyData.media.length > 0) {
+          const existingImages: ImageItem[] = propertyData.media.map((media) => ({
+            id: media.id,
+            preview: media.url,
+            isExisting: true,
+          }));
+          setImages(existingImages);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load property');
+      } finally {
+        setLoadingProperty(false);
+      }
+    };
+
+    loadProperty();
+  }, [id]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -278,6 +288,7 @@ export default function AddProperty() {
       .map((file) => ({
         file,
         preview: URL.createObjectURL(file),
+        isExisting: false,
       }));
 
     setImages((prev) => [...prev, ...newImages]);
@@ -285,11 +296,19 @@ export default function AddProperty() {
 
   const handleImageRemove = (index: number) => {
     setImages((prev) => {
-      const newImages = [...prev];
-      // Only revoke object URLs (blob:), not external URLs (http/https)
-      if (newImages[index].preview.startsWith('blob:')) {
-        URL.revokeObjectURL(newImages[index].preview);
+      const imageToRemove = prev[index];
+      
+      // If it's an existing image, add its ID to removedImageIds
+      if (imageToRemove.id && imageToRemove.isExisting) {
+        setRemovedImageIds((prevIds) => [...prevIds, imageToRemove.id!]);
       }
+
+      // Revoke object URL if it's a blob
+      if (imageToRemove.preview.startsWith('blob:')) {
+        URL.revokeObjectURL(imageToRemove.preview);
+      }
+
+      const newImages = [...prev];
       newImages.splice(index, 1);
       return newImages;
     });
@@ -312,22 +331,6 @@ export default function AddProperty() {
   };
 
   // Cleanup image preview URLs on unmount
-  // Load images from scraped property if available
-  useEffect(() => {
-    if (scrapedProperty?.images && scrapedProperty.images.length > 0) {
-      // Convert image URLs to preview objects
-      // Note: These are external URLs, so we'll store them as previews
-      // The user may need to re-upload them or we can fetch them during submission
-      const imagePreviews = scrapedProperty.images
-        .filter((url): url is string => url !== null && url !== undefined)
-        .map((url) => ({
-          file: null as unknown as File, // We'll handle this during submission
-          preview: url,
-        }));
-      setImages(imagePreviews);
-    }
-  }, [scrapedProperty]);
-
   useEffect(() => {
     return () => {
       images.forEach((img) => {
@@ -341,6 +344,8 @@ export default function AddProperty() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!id) return;
+
     setError(null);
     setLoading(true);
 
@@ -362,7 +367,6 @@ export default function AddProperty() {
         return;
       }
 
-
       // Separate image files and URLs
       const imageFiles: File[] = [];
       const imageUrls: string[] = [];
@@ -371,27 +375,51 @@ export default function AddProperty() {
         // Check if it's a File object (uploaded) or a URL (from scraped property)
         if (img.file && img.file instanceof File) {
           imageFiles.push(img.file);
-        } else if (img.preview && !img.preview.startsWith('blob:')) {
-          // It's an external URL (from scraped property)
+        } else if (img.preview && !img.preview.startsWith('blob:') && !img.isExisting) {
+          // It's an external URL (from scraped property), not an existing image
           imageUrls.push(img.preview);
         }
       });
 
-      await propertiesService.createProperty(
+      await propertiesService.updateProperty(
+        id,
         formData,
         imageFiles.length > 0 ? imageFiles : undefined,
-        imageUrls.length > 0 ? imageUrls : undefined
+        imageUrls.length > 0 ? imageUrls : undefined,
+        removedImageIds.length > 0 ? removedImageIds : undefined
       );
-      toast.success('Property Created', 'Your property has been successfully created.');
-      navigate('/properties', { replace: true });
+      toast.success('Property Updated', 'Your property has been successfully updated.');
+      navigate(`/properties/${id}`, { replace: true });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to create property';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update property';
       setError(errorMessage);
-      toast.error('Creation Failed', errorMessage);
+      toast.error('Update Failed', errorMessage);
     } finally {
       setLoading(false);
     }
   };
+
+  if (loadingProperty) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-sky-50/30">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading property...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!property) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-sky-50/30">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">Property not found</p>
+          <Button onClick={() => navigate(-1)}>Back</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen p-4 sm:p-6 lg:p-8 bg-gradient-to-br from-gray-50 via-white to-sky-50/30">
@@ -435,18 +463,13 @@ export default function AddProperty() {
                 onClick={() => navigate(-1)}
                 className="group relative px-4 py-2.5 bg-white/70 backdrop-blur-md border border-gray-200/60 rounded-xl shadow-sm hover:shadow-md hover:bg-white/90 hover:border-sky-300/50 transition-all duration-300 overflow-hidden"
               >
-                {/* Animated background gradient on hover */}
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-r from-sky-50/0 via-cyan-50/0 to-teal-50/0 group-hover:from-sky-50/50 group-hover:via-cyan-50/50 group-hover:to-teal-50/50 rounded-xl transition-all duration-300"
                   initial={false}
                 />
-                
-                {/* Text with gradient on hover */}
                 <span className="relative z-10 text-sm font-semibold text-gray-700 group-hover:text-sky-700 transition-colors duration-300">
-                  Back to Properties
+                  Back
                 </span>
-
-                {/* Decorative line indicator */}
                 <motion.div
                   className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-0 bg-gradient-to-b from-sky-500 to-cyan-500 rounded-r-full group-hover:h-8 transition-all duration-300"
                   initial={false}
@@ -457,35 +480,30 @@ export default function AddProperty() {
 
           {/* Main Header Content */}
           <div className="relative">
-            {/* Background Decoration */}
             <div className="absolute -top-4 -left-4 w-32 h-32 bg-gradient-to-br from-sky-400/20 via-cyan-400/20 to-teal-400/20 rounded-full blur-3xl -z-10" />
             <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-gradient-to-tr from-indigo-400/20 via-purple-400/20 to-pink-400/20 rounded-full blur-2xl -z-10" />
 
             <div className="relative bg-white/60 backdrop-blur-sm rounded-2xl border border-gray-200/50 p-6 sm:p-8 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex-1">
-                  {/* Badge */}
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-sky-100 to-cyan-100 rounded-full border border-sky-200/50 mb-4">
-                    <div className="w-2 h-2 bg-gradient-to-r from-sky-500 to-cyan-500 rounded-full animate-pulse" />
-                    <span className="text-xs font-semibold text-sky-700 uppercase tracking-wide">
-                      New Listing
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-amber-100 to-orange-100 rounded-full border border-amber-200/50 mb-4">
+                    <div className="w-2 h-2 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full animate-pulse" />
+                    <span className="text-xs font-semibold text-amber-700 uppercase tracking-wide">
+                      Edit Property
                     </span>
                   </div>
 
-                  {/* Title */}
                   <h1 className="text-4xl sm:text-5xl font-bold mb-3">
                     <span className="bg-gradient-to-r from-gray-900 via-sky-800 to-cyan-800 bg-clip-text text-transparent">
-                      Add New Property
+                      Edit Property
                     </span>
                   </h1>
 
-                  {/* Description */}
                   <p className="text-gray-600 text-base sm:text-lg max-w-2xl">
-                    Create a comprehensive property listing with all the details that matter to potential buyers or renters
+                    Update your property listing details and information
                   </p>
                 </div>
 
-                {/* Icon Decoration */}
                 <div className="hidden sm:flex items-center justify-center">
                   <motion.div
                     animate={{
@@ -499,8 +517,8 @@ export default function AddProperty() {
                     }}
                     className="relative"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br from-sky-400/30 to-cyan-400/30 rounded-2xl blur-xl" />
-                    <div className="relative p-4 bg-gradient-to-br from-sky-500 via-cyan-500 to-teal-500 rounded-2xl shadow-lg">
+                    <div className="absolute inset-0 bg-gradient-to-br from-amber-400/30 to-orange-400/30 rounded-2xl blur-xl" />
+                    <div className="relative p-4 bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 rounded-2xl shadow-lg">
                       <Home className="w-8 h-8 text-white" />
                     </div>
                   </motion.div>
@@ -524,13 +542,13 @@ export default function AddProperty() {
                         formData.contactEmail?.trim(),
                       ];
                       const filledCount = requiredFields.filter(Boolean).length;
-                      return filledCount === requiredFields.length ? 'Ready to Submit' : `${filledCount}/${requiredFields.length} Required`;
+                      return filledCount === requiredFields.length ? 'Ready to Update' : `${filledCount}/${requiredFields.length} Required`;
                     })()}
                   </span>
                 </div>
                 <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                   <motion.div
-                    className="h-full bg-gradient-to-r from-sky-500 via-cyan-500 to-teal-500 rounded-full"
+                    className="h-full bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 rounded-full"
                     initial={{ width: '0%' }}
                     animate={{
                       width: `${
@@ -558,10 +576,13 @@ export default function AddProperty() {
           </div>
         </motion.div>
 
-        {/* Form */}
+        {/* Form - Reuse the same form structure from AddProperty */}
+        {/* For brevity, I'll include a note that the form sections are identical to AddProperty */}
+        {/* The form structure would be the same as AddProperty.tsx but with "Update Property" button */}
+        
         <form onSubmit={handleSubmit}>
           <div className="space-y-6">
-            {/* Images Upload */}
+            {/* Images Upload Section - Same as AddProperty */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -575,12 +596,10 @@ export default function AddProperty() {
                 <h2 className="text-xl font-bold text-gray-900">Property Images</h2>
               </div>
 
-              {/* Image Grid with Upload Card */}
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                {/* Image Preview Cards */}
                 {images.map((image, index) => (
                   <motion.div
-                    key={index}
+                    key={image.id || index}
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
@@ -591,7 +610,6 @@ export default function AddProperty() {
                       alt={`Property image ${index + 1}`}
                       className="w-full h-full object-cover"
                     />
-                    {/* Overlay on hover */}
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                       <Button
                         type="button"
@@ -604,16 +622,19 @@ export default function AddProperty() {
                         Remove
                       </Button>
                     </div>
-                    {/* First image badge */}
                     {index === 0 && (
                       <div className="absolute top-2 left-2 px-2 py-1 bg-sky-500 text-white text-xs font-bold rounded-lg shadow-md">
                         Main
                       </div>
                     )}
+                    {image.isExisting && (
+                      <div className="absolute top-2 right-2 px-2 py-1 bg-green-500 text-white text-xs font-bold rounded-lg shadow-md">
+                        Existing
+                      </div>
+                    )}
                   </motion.div>
                 ))}
 
-                {/* Upload Card - Only show if less than 10 images */}
                 {images.length < 10 && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
@@ -660,7 +681,6 @@ export default function AddProperty() {
                 )}
               </div>
 
-              {/* Helper Text */}
               {images.length === 0 && (
                 <p className="text-sm text-gray-500 text-center mt-4">
                   Drag and drop images or click the card above to upload
@@ -724,7 +744,6 @@ export default function AddProperty() {
                         onChange={handleChange}
                         onFocus={() => setShowPropertyTypeOptions(true)}
                         onBlur={() => {
-                          // Delay to allow click on options
                           setTimeout(() => setShowPropertyTypeOptions(false), 200);
                         }}
                         placeholder="Select or type property type"
@@ -753,7 +772,6 @@ export default function AddProperty() {
                         </svg>
                       </button>
                       
-                      {/* Property Type Options Dropdown */}
                       {showPropertyTypeOptions && (
                         <motion.div
                           initial={{ opacity: 0, y: -10 }}
@@ -1128,7 +1146,6 @@ export default function AddProperty() {
                   )}
                 </div>
 
-                {/* Custom Feature Form */}
                 {showCustomFeatureForm && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
@@ -1188,7 +1205,6 @@ export default function AddProperty() {
                   </motion.div>
                 )}
 
-                {/* Display Custom Features */}
                 {formData.features && Object.keys(formData.features).some(
                   (key) => !commonFeatures.find((f) => f.key === key)
                 ) && (
@@ -1224,7 +1240,6 @@ export default function AddProperty() {
                 )}
               </div>
 
-              {/* Selected Features Summary */}
               {formData.features && Object.keys(formData.features).length > 0 && (
                 <div className="mt-4 p-4 bg-sky-50 rounded-xl border border-sky-200">
                   <p className="text-sm font-semibold text-sky-900 mb-2">
@@ -1354,13 +1369,13 @@ export default function AddProperty() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => navigate(-1)}
+                onClick={() => navigate(`/properties/${id}`)}
                 disabled={loading}
               >
                 Cancel
               </Button>
               <Button type="submit" variant="primary" loading={loading} size="lg">
-                Create Property
+                Update Property
               </Button>
             </motion.div>
           </div>

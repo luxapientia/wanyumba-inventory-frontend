@@ -16,6 +16,7 @@ interface PropertiesState {
   filters: PropertyFilters;
   sortBy: string;
   sortOrder: 'asc' | 'desc';
+  search: string;
   selectedProperty: RealEstateProperty | null;
 }
 
@@ -39,9 +40,13 @@ const initialState: PropertiesState = {
     ownerId: undefined,
     page: 1,
     limit: 20,
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
+    search: undefined,
   },
   sortBy: 'createdAt',
   sortOrder: 'desc',
+  search: '',
   selectedProperty: null,
 };
 
@@ -97,7 +102,11 @@ const propertiesSlice = createSlice({
         ...initialState.filters,
         page: state.page,
         limit: state.limit,
+        sortBy: state.sortBy,
+        sortOrder: state.sortOrder,
+        search: state.search || undefined,
       };
+      state.search = '';
     },
     setSorting: (
       state,
@@ -105,7 +114,15 @@ const propertiesSlice = createSlice({
     ) => {
       state.sortBy = action.payload.sortBy;
       state.sortOrder = action.payload.sortOrder;
+      state.filters.sortBy = action.payload.sortBy;
+      state.filters.sortOrder = action.payload.sortOrder;
       state.page = 1; // Reset to first page when sorting changes
+      state.filters.page = 1;
+    },
+    setSearch: (state, action: PayloadAction<string>) => {
+      state.search = action.payload;
+      state.filters.search = action.payload || undefined;
+      state.page = 1; // Reset to first page when search changes
       state.filters.page = 1;
     },
     addProperty: (state, action: PayloadAction<RealEstateProperty>) => {
@@ -159,6 +176,7 @@ export const {
   setFilters,
   clearFilters,
   setSorting,
+  setSearch,
   addProperty,
   updateProperty,
   removeProperty,
