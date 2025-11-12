@@ -53,8 +53,8 @@ const PropertyCard: FC<PropertyCardProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      className={`group relative bg-white rounded-3xl shadow-md border border-gray-200/60 hover:shadow-2xl hover:shadow-sky-500/10 hover:border-sky-300/60 transition-all duration-500 overflow-hidden backdrop-blur-sm ${
-        isListView ? 'flex' : 'w-full'
+      className={`group relative bg-white rounded-3xl shadow-md border border-gray-200/60 hover:shadow-2xl hover:shadow-sky-500/10 hover:border-sky-300/60 transition-all duration-500 overflow-hidden backdrop-blur-sm flex flex-col ${
+        isListView ? '' : 'w-full'
       }`}
       whileHover={{ y: -4 }}
     >
@@ -115,84 +115,89 @@ const PropertyCard: FC<PropertyCardProps> = ({
       </div>
 
       {/* Content Section */}
-      <div className={`relative p-4 sm:p-5 md:p-6 space-y-3 sm:space-y-4 ${isListView ? 'flex-1 flex flex-col justify-between' : ''} z-10`}>
-        {/* Title */}
-        <div>
-          <h3 className="font-bold text-lg sm:text-xl text-gray-900 line-clamp-2 group-hover:text-sky-600 transition-colors duration-300 leading-tight">
-            {property.title || 'Untitled Property'}
-          </h3>
-          {property.description && (
-            <p className="text-sm text-gray-600 mt-2 sm:mt-2.5 line-clamp-2 leading-relaxed">
-              {property.description}
-            </p>
-          )}
-        </div>
-
-        {/* Property Details */}
-        <div className="flex flex-wrap gap-2 sm:gap-3 text-xs sm:text-sm">
-          {property.bedrooms !== null && property.bedrooms !== undefined && (
-            <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 bg-sky-50 rounded-lg sm:rounded-xl border border-sky-100">
-              <span className="font-bold text-sky-700">{property.bedrooms}</span>
-              <span className="text-sky-600">Bed{property.bedrooms !== 1 ? 's' : ''}</span>
-            </div>
-          )}
-          {property.bathrooms !== null && property.bathrooms !== undefined && (
-            <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 bg-cyan-50 rounded-lg sm:rounded-xl border border-cyan-100">
-              <span className="font-bold text-cyan-700">{property.bathrooms}</span>
-              <span className="text-cyan-600">Bath{property.bathrooms !== 1 ? 's' : ''}</span>
-            </div>
-          )}
-          {property.size && (
-            <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 bg-teal-50 rounded-lg sm:rounded-xl border border-teal-100">
-              <span className="font-bold text-teal-700">
-                {property.size.toLocaleString()}
-              </span>
-              <span className="text-teal-600">m²</span>
-            </div>
-          )}
-          {property.propertyType && (
-            <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 bg-gray-50 rounded-lg sm:rounded-xl border border-gray-100">
-              <span className="text-gray-700 capitalize font-medium">{property.propertyType}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Stats */}
-        <div className="flex items-center gap-3 sm:gap-4 text-xs text-gray-500">
-          {property.views > 0 && (
-            <div className="flex items-center gap-1">
-              <Eye size={14} />
-              <span>{property.views}</span>
-            </div>
-          )}
-          {property.favorites > 0 && (
-            <div className="flex items-center gap-1">
-              <Heart size={14} />
-              <span>{property.favorites}</span>
-            </div>
-          )}
-          {property.inquiries > 0 && (
-            <div className="flex items-center gap-1">
-              <MessageCircle size={14} />
-              <span>{property.inquiries}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Location */}
-        {property.address && (
-          <div className="flex items-start gap-2 sm:gap-2.5 text-xs sm:text-sm text-gray-600 bg-gray-50/50 rounded-lg sm:rounded-xl p-2.5 sm:p-3 border border-gray-100">
-            <MapPin size={16} className="sm:w-[18px] sm:h-[18px] text-sky-500 mt-0.5 flex-shrink-0" />
-            <span className="line-clamp-2 leading-relaxed">
-              {property.address}
-              {property.district && `, ${property.district}`}
-              {property.region && `, ${property.region}`}
-            </span>
+      <div className={`relative p-4 sm:p-5 md:p-6 flex flex-col flex-1 z-10 ${isListView ? '' : 'min-h-0'}`}>
+        {/* Top Section - Title, Description, Details, Stats */}
+        <div className="flex-1 space-y-2 sm:space-y-3 min-h-0">
+          {/* Title */}
+          <div>
+            <h3 className="font-bold text-lg sm:text-xl text-gray-900 line-clamp-2 group-hover:text-sky-600 transition-colors duration-300 leading-tight">
+              {property.title || 'Untitled Property'}
+            </h3>
+            {property.description && (
+              <p className="text-sm text-gray-600 mt-2 sm:mt-2.5 line-clamp-2 leading-relaxed">
+                {property.description}
+              </p>
+            )}
           </div>
-        )}
 
-        {/* Footer - Action Buttons */}
-        <div className="flex items-center justify-end gap-2 sm:gap-2.5 pt-3 sm:pt-4 border-t border-gray-100">
+          {/* Property Details */}
+          <div className="flex flex-wrap gap-2 sm:gap-3 text-xs sm:text-sm">
+            {property.bedrooms !== null && property.bedrooms !== undefined && (
+              <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 bg-sky-50 rounded-lg sm:rounded-xl border border-sky-100">
+                <span className="font-bold text-sky-700">{property.bedrooms}</span>
+                <span className="text-sky-600">Bed{property.bedrooms !== 1 ? 's' : ''}</span>
+              </div>
+            )}
+            {property.bathrooms !== null && property.bathrooms !== undefined && (
+              <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 bg-cyan-50 rounded-lg sm:rounded-xl border border-cyan-100">
+                <span className="font-bold text-cyan-700">{property.bathrooms}</span>
+                <span className="text-cyan-600">Bath{property.bathrooms !== 1 ? 's' : ''}</span>
+              </div>
+            )}
+            {property.size && (
+              <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 bg-teal-50 rounded-lg sm:rounded-xl border border-teal-100">
+                <span className="font-bold text-teal-700">
+                  {property.size.toLocaleString()}
+                </span>
+                <span className="text-teal-600">m²</span>
+              </div>
+            )}
+            {property.propertyType && (
+              <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 bg-gray-50 rounded-lg sm:rounded-xl border border-gray-100">
+                <span className="text-gray-700 capitalize font-medium">{property.propertyType}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Stats */}
+          <div className="flex items-center gap-3 sm:gap-4 text-xs text-gray-500">
+            {property.views > 0 && (
+              <div className="flex items-center gap-1">
+                <Eye size={14} />
+                <span>{property.views}</span>
+              </div>
+            )}
+            {property.favorites > 0 && (
+              <div className="flex items-center gap-1">
+                <Heart size={14} />
+                <span>{property.favorites}</span>
+              </div>
+            )}
+            {property.inquiries > 0 && (
+              <div className="flex items-center gap-1">
+                <MessageCircle size={14} />
+                <span>{property.inquiries}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Bottom Section - Location and Action Buttons (Always at bottom) */}
+        <div className="mt-auto pt-1.5 sm:pt-2 space-y-2 sm:space-y-3 border-t border-gray-100">
+          {/* Location */}
+          {property.address && (
+            <div className="flex items-start gap-2 sm:gap-2.5 text-xs sm:text-sm text-gray-600 bg-gray-50/50 rounded-lg sm:rounded-xl p-2.5 sm:p-3 border border-gray-100">
+              <MapPin size={16} className="sm:w-[18px] sm:h-[18px] text-sky-500 mt-0.5 flex-shrink-0" />
+              <span className="line-clamp-2 leading-relaxed">
+                {property.address}
+                {property.district && `, ${property.district}`}
+                {property.region && `, ${property.region}`}
+              </span>
+            </div>
+          )}
+
+          {/* Footer - Action Buttons */}
+          <div className="flex items-center justify-end gap-2 sm:gap-2.5">
           {/* View Details Button */}
           {onViewDetails && (
             <motion.button
@@ -238,6 +243,7 @@ const PropertyCard: FC<PropertyCardProps> = ({
               <Trash2 size={18} className="sm:w-5 sm:h-5" />
             </motion.button>
           )}
+          </div>
         </div>
       </div>
     </motion.div>
