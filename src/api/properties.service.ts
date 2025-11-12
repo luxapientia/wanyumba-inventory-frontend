@@ -206,6 +206,19 @@ class PropertiesService {
   }
 
   /**
+   * Publish property (set status to PENDING)
+   */
+  async publishProperty(id: string): Promise<RealEstateProperty> {
+    const response = await apiClient.post<ApiResponse<RealEstateProperty>>(
+      `${this.API_PREFIX}/${id}/publish`
+    );
+    if (!response.data.success || !response.data.data) {
+      throw new Error(response.data.message || 'Failed to publish property');
+    }
+    return response.data.data;
+  }
+
+  /**
    * Get scraped properties by phone number with pagination, filtering, searching, and sorting.
    * Phone number is handled server-side (hardcoded for now).
    */

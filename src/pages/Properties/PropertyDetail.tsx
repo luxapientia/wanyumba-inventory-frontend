@@ -29,6 +29,7 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  Globe,
 } from 'lucide-react';
 import Button from '../../components/UI/Button.js';
 import { ConfirmationModal } from '../../components/UI/index.js';
@@ -47,6 +48,7 @@ export default function PropertyDetail() {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [publishing, setPublishing] = useState(false);
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -172,6 +174,26 @@ export default function PropertyDetail() {
     }
   };
 
+  const handlePublish = async () => {
+    if (!property || !id) return;
+
+    try {
+      setPublishing(true);
+      const updatedProperty = await propertiesService.publishProperty(id);
+      setProperty(updatedProperty);
+      toast.success(
+        'Property Published',
+        'The property has been published and is now pending review. It will be visible to the public once approved.'
+      );
+    } catch (error) {
+      console.error('Failed to publish property:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to publish property';
+      toast.error('Publish Failed', errorMessage);
+    } finally {
+      setPublishing(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-sky-50/30">
@@ -221,6 +243,38 @@ export default function PropertyDetail() {
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2">
+            {property.status !== 'ACTIVE' && property.status !== 'PENDING' && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handlePublish}
+                disabled={publishing}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Publish Property"
+              >
+                {publishing ? (
+                  <>
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                      className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                    />
+                    <span className="hidden sm:inline">Publishing...</span>
+                  </>
+                ) : (
+                  <>
+                    <Globe size={18} />
+                    <span className="hidden sm:inline">Publish</span>
+                  </>
+                )}
+              </motion.button>
+            )}
+            {property.status === 'PENDING' && (
+              <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200/60 text-yellow-700 rounded-xl">
+                <Globe size={18} />
+                <span className="hidden sm:inline">Pending Review</span>
+              </div>
+            )}
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
