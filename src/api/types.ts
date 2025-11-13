@@ -97,6 +97,7 @@ export interface CreatePropertyDto {
   contactPhone?: string;
   contactEmail?: string;
   expiresAt?: string;
+  scrapedPropertyId?: string; // ID of the scraped property this listing originated from
 }
 
 // Update Property DTO

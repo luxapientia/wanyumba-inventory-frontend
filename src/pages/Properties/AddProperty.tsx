@@ -102,6 +102,7 @@ const mapScrapedPropertyToFormData = (scraped: ScrapedProperty): Partial<CreateP
     contactName: scraped.agentName || '',
     contactPhone: scraped.agentPhone || scraped.agentWhatsapp || '',
     contactEmail: scraped.agentEmail || '',
+    scrapedPropertyId: scraped.sourceListingId || undefined,
   };
 };
 
@@ -144,6 +145,7 @@ export default function AddProperty() {
       contactPhone: '',
       contactEmail: '',
       expiresAt: undefined,
+      scrapedPropertyId: undefined,
     };
 
     if (scrapedProperty) {
