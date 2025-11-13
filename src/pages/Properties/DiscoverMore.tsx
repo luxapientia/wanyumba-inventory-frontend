@@ -4,7 +4,7 @@ import { Search, Filter, Grid3x3, List } from 'lucide-react';
 import Button from '../../components/UI/Button.js';
 import { Input } from '../../components/UI/index.js';
 import { useAppDispatch, useAppSelector } from '../../store/hooks.js';
-import { fetchScrapedPropertiesByPhone } from '../../store/thunks/scrapedPropertiesThunks.js';
+import { fetchScrapedPropertiesByPhone, fetchScrapedPropertyTypes } from '../../store/thunks/scrapedPropertiesThunks.js';
 import {
   setScrapedPage,
   setScrapedLimit,
@@ -14,7 +14,6 @@ import {
 } from '../../store/slices/scrapedPropertiesSlice.js';
 import DiscoveredPropertyCard from '../../components/Properties/DiscoveredPropertyCard.js';
 import PropertyDetailModal from '../../components/Properties/PropertyDetailModal.js';
-import propertiesService from '../../api/properties.service.js';
 import type { ScrapedProperty } from '../../api/types.js';
 
 export default function DiscoverMore() {
@@ -31,29 +30,17 @@ export default function DiscoverMore() {
     sortBy,
     sortOrder,
     search,
+    propertyTypes, // Get property types from Redux state
   } = scrapedPropertiesState;
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [propertyTypes, setPropertyTypes] = useState<string[]>([]);
-  const [propertyTypesLoading, setPropertyTypesLoading] = useState(false);
   const [selectedListing, setSelectedListing] = useState<ScrapedProperty | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Fetch property types on mount
+  // Fetch scraped property types on mount
   useEffect(() => {
-    const fetchPropertyTypes = async () => {
-      setPropertyTypesLoading(true);
-      try {
-        const types = await propertiesService.getPropertyTypes();
-        setPropertyTypes(types);
-      } catch (error) {
-        console.error('Failed to fetch property types:', error);
-      } finally {
-        setPropertyTypesLoading(false);
-      }
-    };
-    fetchPropertyTypes();
-  }, []);
+    dispatch(fetchScrapedPropertyTypes());
+  }, [dispatch]);
 
   // Fetch scraped properties when filters, pagination, or sorting changes
   useEffect(() => {
@@ -185,8 +172,7 @@ export default function DiscoverMore() {
                   } as any)
                 )
               }
-              disabled={propertyTypesLoading}
-              className="px-3 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-100 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-100 transition-all text-sm"
             >
               <option value="">All Property Types</option>
               {propertyTypes.map((type: string) => (

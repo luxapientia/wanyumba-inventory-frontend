@@ -4,6 +4,7 @@ import {
   setProperties,
   setLoading,
   setError,
+  setPropertyTypes,
 } from '../slices/propertiesSlice.js';
 import type { RootState } from '../index.js';
 import type {
@@ -187,6 +188,29 @@ export const fetchScrapedPropertiesByPhone = createAsyncThunk(
           : 'Failed to fetch scraped properties';
       dispatch(setError(message));
       throw error;
+    }
+  }
+);
+
+/**
+ * Fetch property types from the database
+ */
+export const fetchPropertyTypes = createAsyncThunk(
+  'properties/fetchPropertyTypes',
+  async (_, { dispatch }) => {
+    try {
+      const propertyTypes = await propertiesService.getPropertyTypes();
+      dispatch(setPropertyTypes(propertyTypes));
+      return propertyTypes;
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Failed to fetch property types';
+      console.error(message);
+      // Return empty array on error instead of throwing
+      dispatch(setPropertyTypes([]));
+      return [];
     }
   }
 );

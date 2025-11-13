@@ -6,7 +6,7 @@ import Button from '../../components/UI/Button.js';
 import { Input, ConfirmationModal } from '../../components/UI/index.js';
 import { useToast } from '../../contexts/index.js';
 import { useAppDispatch, useAppSelector } from '../../store/hooks.js';
-import { fetchProperties, deleteProperty } from '../../store/thunks/propertiesThunks.js';
+import { fetchProperties, deleteProperty, fetchPropertyTypes } from '../../store/thunks/propertiesThunks.js';
 import {
   setPage,
   setLimit,
@@ -34,12 +34,18 @@ export default function Properties() {
     sortBy,
     sortOrder,
     search,
+    propertyTypes, // Get property types from Redux state
   } = propertiesState;
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [propertyToDelete, setPropertyToDelete] = useState<RealEstateProperty | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  // Fetch property types from API on component mount
+  useEffect(() => {
+    dispatch(fetchPropertyTypes());
+  }, [dispatch]);
 
   // Fetch properties when filters, pagination, or sorting changes
   useEffect(() => {
@@ -234,13 +240,18 @@ export default function Properties() {
           </select>
 
           {/* Property Type Filter */}
-          <input
-            type="text"
+          <select
             value={filters.propertyType || ''}
             onChange={(e) => handlePropertyTypeFilter(e.target.value || undefined)}
-            placeholder="Property Type"
             className="px-3 py-1.5 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-sky-500 text-sm"
-          />
+          >
+            <option value="">All Property Types</option>
+            {propertyTypes.map((type: string) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </select>
         </div>
       </motion.div>
 

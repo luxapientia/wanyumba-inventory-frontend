@@ -32,10 +32,14 @@ import {
 import Button from '../../components/UI/Button.js';
 import Input from '../../components/UI/Input.js';
 import { useToast } from '../../contexts/index.js';
+import { useAppDispatch, useAppSelector } from '../../store/hooks.js';
+import { fetchPropertyTypes } from '../../store/thunks/propertiesThunks.js';
 import propertiesService from '../../api/properties.service.js';
 import type { CreatePropertyDto, RealEstateProperty } from '../../api/types.js';
+import type { RootState } from '../../store/index.js';
 
-const PROPERTY_TYPES = [
+// Default property types (fallback if API fails)
+const DEFAULT_PROPERTY_TYPES = [
   'House',
   'Apartment',
   'Land',
@@ -68,10 +72,14 @@ export default function EditProperty() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const toast = useToast();
+  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
   const [loadingProperty, setLoadingProperty] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [property, setProperty] = useState<RealEstateProperty | null>(null);
+
+  // Get property types from Redux state
+  const propertyTypes = useAppSelector((state: RootState) => state.properties.propertyTypes);
 
   const [formData, setFormData] = useState<CreatePropertyDto>({
     title: '',
@@ -109,7 +117,21 @@ export default function EditProperty() {
   const [removedImageIds, setRemovedImageIds] = useState<string[]>([]);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [showPropertyTypeOptions, setShowPropertyTypeOptions] = useState<boolean>(false);
-  const [filteredPropertyTypes, setFilteredPropertyTypes] = useState<string[]>(PROPERTY_TYPES);
+  const [filteredPropertyTypes, setFilteredPropertyTypes] = useState<string[]>(
+    propertyTypes.length > 0 ? propertyTypes : DEFAULT_PROPERTY_TYPES
+  );
+
+  // Fetch property types from API on component mount
+  useEffect(() => {
+    dispatch(fetchPropertyTypes());
+  }, [dispatch]);
+
+  // Update filtered property types when propertyTypes from Redux changes
+  useEffect(() => {
+    if (propertyTypes.length > 0) {
+      setFilteredPropertyTypes(propertyTypes);
+    }
+  }, [propertyTypes]);
 
   // Common features with icons
   const commonFeatures = [
@@ -212,13 +234,14 @@ export default function EditProperty() {
     // Filter property types when typing in propertyType field
     if (name === 'propertyType') {
       const searchValue = value.toLowerCase().trim();
+      const typesToFilter = propertyTypes.length > 0 ? propertyTypes : DEFAULT_PROPERTY_TYPES;
       if (searchValue) {
-        const filtered = PROPERTY_TYPES.filter((type) =>
+        const filtered = typesToFilter.filter((type) =>
           type.toLowerCase().includes(searchValue)
         );
-        setFilteredPropertyTypes(filtered.length > 0 ? filtered : PROPERTY_TYPES);
+        setFilteredPropertyTypes(filtered.length > 0 ? filtered : typesToFilter);
       } else {
-        setFilteredPropertyTypes(PROPERTY_TYPES);
+        setFilteredPropertyTypes(typesToFilter);
       }
       setShowPropertyTypeOptions(true);
     }
@@ -759,7 +782,8 @@ export default function EditProperty() {
                         onChange={handleChange}
                         onFocus={() => {
                           setShowPropertyTypeOptions(true);
-                          setFilteredPropertyTypes(PROPERTY_TYPES);
+                          const typesToUse = propertyTypes.length > 0 ? propertyTypes : DEFAULT_PROPERTY_TYPES;
+                          setFilteredPropertyTypes(typesToUse);
                         }}
                         onBlur={() => {
                           setTimeout(() => setShowPropertyTypeOptions(false), 200);
@@ -803,7 +827,7 @@ export default function EditProperty() {
                             {filteredPropertyTypes.length > 0 ? (
                               <>
                                 <p className="text-xs font-semibold text-gray-500 px-3 py-2 mb-1">
-                                  {filteredPropertyTypes.length === PROPERTY_TYPES.length
+                                  {filteredPropertyTypes.length === (propertyTypes.length > 0 ? propertyTypes.length : DEFAULT_PROPERTY_TYPES.length)
                                     ? 'Common Types'
                                     : `Matching Types (${filteredPropertyTypes.length})`}
                                 </p>
@@ -815,7 +839,8 @@ export default function EditProperty() {
                                       onClick={() => {
                                         setFormData((prev) => ({ ...prev, propertyType: type }));
                                         setShowPropertyTypeOptions(false);
-                                        setFilteredPropertyTypes(PROPERTY_TYPES);
+                                        const typesToUse = propertyTypes.length > 0 ? propertyTypes : DEFAULT_PROPERTY_TYPES;
+                                        setFilteredPropertyTypes(typesToUse);
                                       }}
                                       whileHover={{ scale: 1.02 }}
                                       whileTap={{ scale: 0.98 }}
@@ -862,7 +887,7 @@ export default function EditProperty() {
                         className="text-xs text-gray-500 px-1 flex items-center gap-1"
                       >
                         <span className="w-1.5 h-1.5 bg-sky-500 rounded-full"></span>
-                        {PROPERTY_TYPES.some(
+                        {(propertyTypes.length > 0 ? propertyTypes : DEFAULT_PROPERTY_TYPES).some(
                           (type) => type.toLowerCase() === formData.propertyType.toLowerCase()
                         )
                           ? 'Common property type'

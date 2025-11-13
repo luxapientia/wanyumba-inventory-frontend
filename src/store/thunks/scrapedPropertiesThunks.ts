@@ -4,6 +4,7 @@ import {
   setScrapedProperties,
   setScrapedLoading,
   setScrapedError,
+  setScrapedPropertyTypes,
 } from '../slices/scrapedPropertiesSlice.js';
 import type { RootState } from '../index.js';
 import type { ScrapedPropertiesFilters } from '../../api/types.js';
@@ -52,6 +53,29 @@ export const fetchScrapedPropertiesByPhone = createAsyncThunk(
           : 'Failed to fetch scraped properties';
       dispatch(setScrapedError(message));
       throw error;
+    }
+  }
+);
+
+/**
+ * Fetch property types from the scraper service
+ */
+export const fetchScrapedPropertyTypes = createAsyncThunk(
+  'scrapedProperties/fetchPropertyTypes',
+  async (_, { dispatch }) => {
+    try {
+      const propertyTypes = await propertiesService.getPropertyTypesFromScrapper();
+      dispatch(setScrapedPropertyTypes(propertyTypes));
+      return propertyTypes;
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Failed to fetch scraped property types';
+      console.error(message);
+      // Return empty array on error instead of throwing
+      dispatch(setScrapedPropertyTypes([]));
+      return [];
     }
   }
 );

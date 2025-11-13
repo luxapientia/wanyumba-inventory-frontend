@@ -32,10 +32,14 @@ import {
 import Button from '../../components/UI/Button.js';
 import Input from '../../components/UI/Input.js';
 import { useToast } from '../../contexts/index.js';
+import { useAppDispatch, useAppSelector } from '../../store/hooks.js';
+import { fetchPropertyTypes } from '../../store/thunks/propertiesThunks.js';
 import propertiesService from '../../api/properties.service.js';
 import type { CreatePropertyDto, ScrapedProperty } from '../../api/types.js';
+import type { RootState } from '../../store/index.js';
 
-const PROPERTY_TYPES = [
+// Default property types (fallback if API fails)
+const DEFAULT_PROPERTY_TYPES = [
   'House',
   'Apartment',
   'Land',
@@ -74,13 +78,8 @@ const mapScrapedPropertyToFormData = (scraped: ScrapedProperty): Partial<CreateP
     // Normalize: capitalize first letter, lowercase the rest
     propertyType = propertyType.charAt(0).toUpperCase() + propertyType.slice(1).toLowerCase();
     
-    // Check if it matches any common property type (case-insensitive)
-    const matchedType = PROPERTY_TYPES.find(
-      (type) => type.toLowerCase() === propertyType.toLowerCase()
-    );
-    if (matchedType) {
-      propertyType = matchedType; // Use the exact format from PROPERTY_TYPES
-    }
+    // Note: We can't match against PROPERTY_TYPES here since it's fetched from API
+    // Just normalize the case
   }
 
   return {
@@ -110,8 +109,12 @@ export default function AddProperty() {
   const navigate = useNavigate();
   const location = useLocation();
   const toast = useToast();
+  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Get property types from Redux state
+  const propertyTypes = useAppSelector((state: RootState) => state.properties.propertyTypes);
 
   // Get scraped property from navigation state
   const scrapedProperty = (location.state as { scrapedProperty?: ScrapedProperty })?.scrapedProperty;
@@ -164,7 +167,21 @@ export default function AddProperty() {
   const [images, setImages] = useState<{ file: File; preview: string }[]>([]);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [showPropertyTypeOptions, setShowPropertyTypeOptions] = useState<boolean>(false);
-  const [filteredPropertyTypes, setFilteredPropertyTypes] = useState<string[]>(PROPERTY_TYPES);
+  const [filteredPropertyTypes, setFilteredPropertyTypes] = useState<string[]>(
+    propertyTypes.length > 0 ? propertyTypes : DEFAULT_PROPERTY_TYPES
+  );
+
+  // Fetch property types from API on component mount
+  useEffect(() => {
+    dispatch(fetchPropertyTypes());
+  }, [dispatch]);
+
+  // Update filtered property types when propertyTypes from Redux changes
+  useEffect(() => {
+    if (propertyTypes.length > 0) {
+      setFilteredPropertyTypes(propertyTypes);
+    }
+  }, [propertyTypes]);
 
   // Common features with icons
   const commonFeatures = [
@@ -204,13 +221,14 @@ export default function AddProperty() {
     // Filter property types when typing in propertyType field
     if (name === 'propertyType') {
       const searchValue = value.toLowerCase().trim();
+      const typesToFilter = propertyTypes.length > 0 ? propertyTypes : DEFAULT_PROPERTY_TYPES;
       if (searchValue) {
-        const filtered = PROPERTY_TYPES.filter((type) =>
+        const filtered = typesToFilter.filter((type) =>
           type.toLowerCase().includes(searchValue)
         );
-        setFilteredPropertyTypes(filtered.length > 0 ? filtered : PROPERTY_TYPES);
+        setFilteredPropertyTypes(filtered.length > 0 ? filtered : typesToFilter);
       } else {
-        setFilteredPropertyTypes(PROPERTY_TYPES);
+        setFilteredPropertyTypes(typesToFilter);
       }
       setShowPropertyTypeOptions(true);
     }
@@ -741,7 +759,8 @@ export default function AddProperty() {
                         onChange={handleChange}
                         onFocus={() => {
                           setShowPropertyTypeOptions(true);
-                          setFilteredPropertyTypes(PROPERTY_TYPES);
+                          const typesToUse = propertyTypes.length > 0 ? propertyTypes : DEFAULT_PROPERTY_TYPES;
+                          setFilteredPropertyTypes(typesToUse);
                         }}
                         onBlur={() => {
                           // Delay to allow click on options
@@ -786,7 +805,7 @@ export default function AddProperty() {
                             {filteredPropertyTypes.length > 0 ? (
                               <>
                                 <p className="text-xs font-semibold text-gray-500 px-3 py-2 mb-1">
-                                  {filteredPropertyTypes.length === PROPERTY_TYPES.length
+                                  {filteredPropertyTypes.length === (propertyTypes.length > 0 ? propertyTypes.length : DEFAULT_PROPERTY_TYPES.length)
                                     ? 'Common Types'
                                     : `Matching Types (${filteredPropertyTypes.length})`}
                                 </p>
@@ -798,7 +817,8 @@ export default function AddProperty() {
                                       onClick={() => {
                                         setFormData((prev) => ({ ...prev, propertyType: type }));
                                         setShowPropertyTypeOptions(false);
-                                        setFilteredPropertyTypes(PROPERTY_TYPES);
+                                        const typesToUse = propertyTypes.length > 0 ? propertyTypes : DEFAULT_PROPERTY_TYPES;
+                                        setFilteredPropertyTypes(typesToUse);
                                       }}
                                       whileHover={{ scale: 1.02 }}
                                       whileTap={{ scale: 0.98 }}
@@ -845,7 +865,7 @@ export default function AddProperty() {
                         className="text-xs text-gray-500 px-1 flex items-center gap-1"
                       >
                         <span className="w-1.5 h-1.5 bg-sky-500 rounded-full"></span>
-                        {PROPERTY_TYPES.some(
+                        {(propertyTypes.length > 0 ? propertyTypes : DEFAULT_PROPERTY_TYPES).some(
                           (type) => type.toLowerCase() === formData.propertyType.toLowerCase()
                         )
                           ? 'Common property type'

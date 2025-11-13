@@ -265,7 +265,7 @@ class PropertiesService {
   }
 
   /**
-   * Get all unique property types from the scraper service
+   * Get all unique property types from the database (RealEstateListing table)
    */
   async getPropertyTypes(): Promise<string[]> {
     const response = await apiClient.get<ApiResponse<string[]>>(
@@ -274,6 +274,21 @@ class PropertiesService {
     if (!response.data.success || !response.data.data) {
       throw new Error(
         response.data.message || 'Failed to fetch property types'
+      );
+    }
+    return response.data.data;
+  }
+
+  /**
+   * Get all unique property types from the scraper service
+   */
+  async getPropertyTypesFromScrapper(): Promise<string[]> {
+    const response = await apiClient.get<ApiResponse<string[]>>(
+      `${this.API_PREFIX}/property-types/scraper`
+    );
+    if (!response.data.success || !response.data.data) {
+      throw new Error(
+        response.data.message || 'Failed to fetch property types from scraper'
       );
     }
     return response.data.data;

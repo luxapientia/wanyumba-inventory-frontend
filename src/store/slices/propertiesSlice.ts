@@ -18,6 +18,7 @@ interface PropertiesState {
   sortOrder: 'asc' | 'desc';
   search: string;
   selectedProperty: RealEstateProperty | null;
+  propertyTypes: string[]; // Property types from database
 }
 
 const initialState: PropertiesState = {
@@ -48,6 +49,7 @@ const initialState: PropertiesState = {
   sortOrder: 'desc',
   search: '',
   selectedProperty: null,
+  propertyTypes: [], // Property types from database
 };
 
 const propertiesSlice = createSlice({
@@ -163,6 +165,9 @@ const propertiesSlice = createSlice({
     ) => {
       state.selectedProperty = action.payload;
     },
+    setPropertyTypes: (state, action: PayloadAction<string[]>) => {
+      state.propertyTypes = action.payload;
+    },
     resetProperties: () => initialState,
   },
 });
@@ -181,6 +186,7 @@ export const {
   updateProperty,
   removeProperty,
   setSelectedProperty,
+  setPropertyTypes,
   resetProperties,
 } = propertiesSlice.actions;
 

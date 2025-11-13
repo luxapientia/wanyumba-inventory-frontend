@@ -17,6 +17,7 @@ interface ScrapedPropertiesState {
   sortBy: string;
   sortOrder: 'asc' | 'desc';
   search: string;
+  propertyTypes: string[]; // Property types from scraper service
 }
 
 const initialState: ScrapedPropertiesState = {
@@ -37,6 +38,7 @@ const initialState: ScrapedPropertiesState = {
   sortBy: 'created_at',
   sortOrder: 'desc',
   search: '',
+  propertyTypes: [], // Property types from scraper service
 };
 
 const scrapedPropertiesSlice = createSlice({
@@ -113,6 +115,9 @@ const scrapedPropertiesSlice = createSlice({
       };
       state.search = '';
     },
+    setScrapedPropertyTypes: (state, action: PayloadAction<string[]>) => {
+      state.propertyTypes = action.payload;
+    },
     resetScrapedProperties: () => initialState,
   },
 });
@@ -127,6 +132,7 @@ export const {
   setScrapedSorting,
   setScrapedSearch,
   clearScrapedFilters,
+  setScrapedPropertyTypes,
   resetScrapedProperties,
 } = scrapedPropertiesSlice.actions;
 
