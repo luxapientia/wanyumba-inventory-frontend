@@ -30,6 +30,7 @@ import {
   ChevronRight,
   X,
   Globe,
+  AlertCircle,
 } from 'lucide-react';
 import Button from '../../components/UI/Button.js';
 import { ConfirmationModal } from '../../components/UI/index.js';
@@ -481,6 +482,38 @@ export default function PropertyDetail() {
                 )}
               </div>
             </motion.div>
+
+            {/* Rejection Reason */}
+            {property.status === 'REJECTED' && property.rejectionReason && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.35 }}
+                className="bg-gradient-to-br from-red-50 to-rose-50 rounded-2xl shadow-md border-2 border-red-200 p-6 sm:p-8"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-red-500 to-rose-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <AlertCircle className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="text-xl font-bold text-red-900 mb-3 flex items-center gap-2">
+                      Rejection Reason
+                    </h2>
+                    <div className="bg-white rounded-xl p-4 border border-red-200 shadow-sm">
+                      <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
+                        {property.rejectionReason}
+                      </p>
+                    </div>
+                    {property.moderatedAt && (
+                      <p className="text-sm text-red-700 mt-3 flex items-center gap-2">
+                        <Calendar size={16} />
+                        Rejected on {formatDate(property.moderatedAt)}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            )}
 
             {/* Features */}
             {featureEntries.length > 0 && (
