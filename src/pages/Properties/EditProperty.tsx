@@ -109,6 +109,7 @@ export default function EditProperty() {
   const [removedImageIds, setRemovedImageIds] = useState<string[]>([]);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [showPropertyTypeOptions, setShowPropertyTypeOptions] = useState<boolean>(false);
+  const [filteredPropertyTypes, setFilteredPropertyTypes] = useState<string[]>(PROPERTY_TYPES);
 
   // Common features with icons
   const commonFeatures = [
@@ -207,6 +208,20 @@ export default function EditProperty() {
           : value,
     }));
     setError(null);
+    
+    // Filter property types when typing in propertyType field
+    if (name === 'propertyType') {
+      const searchValue = value.toLowerCase().trim();
+      if (searchValue) {
+        const filtered = PROPERTY_TYPES.filter((type) =>
+          type.toLowerCase().includes(searchValue)
+        );
+        setFilteredPropertyTypes(filtered.length > 0 ? filtered : PROPERTY_TYPES);
+      } else {
+        setFilteredPropertyTypes(PROPERTY_TYPES);
+      }
+      setShowPropertyTypeOptions(true);
+    }
   };
 
   const toggleFeature = (key: string) => {
@@ -742,11 +757,15 @@ export default function EditProperty() {
                         name="propertyType"
                         value={formData.propertyType}
                         onChange={handleChange}
-                        onFocus={() => setShowPropertyTypeOptions(true)}
+                        onFocus={() => {
+                          setShowPropertyTypeOptions(true);
+                          setFilteredPropertyTypes(PROPERTY_TYPES);
+                        }}
                         onBlur={() => {
                           setTimeout(() => setShowPropertyTypeOptions(false), 200);
                         }}
                         placeholder="Select or type property type"
+                        autoComplete="off"
                         required
                         className="w-full pl-11 pr-12 py-2.5 rounded-xl border-2 border-gray-200 bg-white hover:border-gray-300 focus:border-sky-500 focus:ring-4 focus:ring-sky-100 transition-all duration-200 focus:outline-none shadow-sm hover:shadow-md focus:shadow-lg"
                       />
@@ -772,6 +791,7 @@ export default function EditProperty() {
                         </svg>
                       </button>
                       
+                      {/* Property Type Options Dropdown */}
                       {showPropertyTypeOptions && (
                         <motion.div
                           initial={{ opacity: 0, y: -10 }}
@@ -780,38 +800,57 @@ export default function EditProperty() {
                           className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl border-2 border-gray-200 shadow-xl z-50 max-h-64 overflow-y-auto"
                         >
                           <div className="p-2">
-                            <p className="text-xs font-semibold text-gray-500 px-3 py-2 mb-1">Common Types</p>
-                            <div className="grid grid-cols-2 gap-2">
-                              {PROPERTY_TYPES.map((type) => (
-                                <motion.button
-                                  key={type}
-                                  type="button"
-                                  onClick={() => {
-                                    setFormData((prev) => ({ ...prev, propertyType: type }));
-                                    setShowPropertyTypeOptions(false);
-                                  }}
-                                  whileHover={{ scale: 1.02 }}
-                                  whileTap={{ scale: 0.98 }}
-                                  className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-left ${
-                                    formData.propertyType === type
-                                      ? 'bg-gradient-to-r from-sky-500 to-cyan-500 text-white shadow-md shadow-sky-500/30'
-                                      : 'bg-gray-50 hover:bg-sky-50 text-gray-700 hover:text-sky-700 border border-gray-200 hover:border-sky-300'
-                                  }`}
-                                >
-                                  <div className="flex items-center gap-2">
-                                    <Building2
-                                      className={`w-4 h-4 ${
-                                        formData.propertyType === type ? 'text-white' : 'text-sky-600'
+                            {filteredPropertyTypes.length > 0 ? (
+                              <>
+                                <p className="text-xs font-semibold text-gray-500 px-3 py-2 mb-1">
+                                  {filteredPropertyTypes.length === PROPERTY_TYPES.length
+                                    ? 'Common Types'
+                                    : `Matching Types (${filteredPropertyTypes.length})`}
+                                </p>
+                                <div className="grid grid-cols-2 gap-2">
+                                  {filteredPropertyTypes.map((type) => (
+                                    <motion.button
+                                      key={type}
+                                      type="button"
+                                      onClick={() => {
+                                        setFormData((prev) => ({ ...prev, propertyType: type }));
+                                        setShowPropertyTypeOptions(false);
+                                        setFilteredPropertyTypes(PROPERTY_TYPES);
+                                      }}
+                                      whileHover={{ scale: 1.02 }}
+                                      whileTap={{ scale: 0.98 }}
+                                      className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-left ${
+                                        formData.propertyType.toLowerCase() === type.toLowerCase()
+                                          ? 'bg-gradient-to-r from-sky-500 to-cyan-500 text-white shadow-md shadow-sky-500/30'
+                                          : 'bg-gray-50 hover:bg-sky-50 text-gray-700 hover:text-sky-700 border border-gray-200 hover:border-sky-300'
                                       }`}
-                                    />
-                                    <span>{type}</span>
-                                  </div>
-                                </motion.button>
-                              ))}
-                            </div>
-                            <div className="mt-3 pt-3 border-t border-gray-200">
-                              <p className="text-xs text-gray-500 px-3 mb-2">Or type a custom property type above</p>
-                            </div>
+                                    >
+                                      <div className="flex items-center gap-2">
+                                        <Building2
+                                          className={`w-4 h-4 ${
+                                            formData.propertyType.toLowerCase() === type.toLowerCase()
+                                              ? 'text-white'
+                                              : 'text-sky-600'
+                                          }`}
+                                        />
+                                        <span>{type}</span>
+                                      </div>
+                                    </motion.button>
+                                  ))}
+                                </div>
+                              </>
+                            ) : (
+                              <p className="text-xs text-gray-500 px-3 py-2">
+                                No matching types. Type a custom property type above.
+                              </p>
+                            )}
+                            {filteredPropertyTypes.length > 0 && (
+                              <div className="mt-3 pt-3 border-t border-gray-200">
+                                <p className="text-xs text-gray-500 px-3 mb-2">
+                                  Or type a custom property type above
+                                </p>
+                              </div>
+                            )}
                           </div>
                         </motion.div>
                       )}
@@ -823,7 +862,9 @@ export default function EditProperty() {
                         className="text-xs text-gray-500 px-1 flex items-center gap-1"
                       >
                         <span className="w-1.5 h-1.5 bg-sky-500 rounded-full"></span>
-                        {PROPERTY_TYPES.includes(formData.propertyType)
+                        {PROPERTY_TYPES.some(
+                          (type) => type.toLowerCase() === formData.propertyType.toLowerCase()
+                        )
                           ? 'Common property type'
                           : 'Custom property type'}
                       </motion.p>
