@@ -3,23 +3,24 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Home,
   Package,
-  Search,
   Settings,
   BarChart3,
   Activity,
   TrendingUp,
-  Sparkles,
   ChevronDown,
   ChevronRight,
   Database,
   Compass,
   Plus,
+  Shield,
+  CheckCircle,
+  ClipboardList,
 } from 'lucide-react';
 import { useState } from 'react';
 
 const Sidebar = () => {
   const location = useLocation();
-  const [expandedItems, setExpandedItems] = useState<string[]>(['properties']);
+  const [expandedItems, setExpandedItems] = useState<string[]>(['properties', 'admin']);
 
   const toggleExpanded = (itemId: string) => {
     setExpandedItems((prev) =>
@@ -62,11 +63,23 @@ const Sidebar = () => {
       ],
     },
     {
-      path: '/search',
-      icon: Search,
-      label: 'Search',
-      color: 'from-blue-500 via-sky-500 to-cyan-600',
-      glow: 'rgba(14, 165, 233, 0.3)',
+      path: '/admin',
+      icon: Shield,
+      label: 'Admin',
+      color: 'from-purple-500 via-pink-500 to-rose-600',
+      glow: 'rgba(168, 85, 247, 0.3)',
+      subItems: [
+        {
+          path: '/admin/properties',
+          label: 'Manage Properties',
+          icon: ClipboardList,
+        },
+        {
+          path: '/admin/properties/pending',
+          label: 'Pending Approval',
+          icon: CheckCircle,
+        },
+      ],
     },
     {
       path: '/analytics',
@@ -241,9 +254,9 @@ const Sidebar = () => {
                           </div>
 
                           {/* Label - Hidden on mobile, visible on lg+ */}
-                          <div className="hidden lg:flex flex-col flex-1 min-w-0">
+                          <div className="hidden lg:flex flex-col flex-1 min-w-0 items-start">
                             <span
-                              className={`font-semibold text-sm truncate ${
+                              className={`font-semibold text-sm truncate text-left ${
                                 isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'
                               }`}
                             >
@@ -252,11 +265,11 @@ const Sidebar = () => {
                           </div>
 
                           {/* Expand/Collapse Icon */}
-                          <div className="hidden lg:block flex-shrink-0">
+                          <div className="flex-shrink-0">
                             {isExpanded ? (
-                              <ChevronDown size={16} className={isActive ? 'text-white' : 'text-gray-400'} />
+                              <ChevronDown size={14} className={`lg:w-4 lg:h-4 ${isActive ? 'text-white' : 'text-gray-400'}`} />
                             ) : (
-                              <ChevronRight size={16} className={isActive ? 'text-white' : 'text-gray-400'} />
+                              <ChevronRight size={14} className={`lg:w-4 lg:h-4 ${isActive ? 'text-white' : 'text-gray-400'}`} />
                             )}
                           </div>
                         </div>
@@ -395,7 +408,7 @@ const Sidebar = () => {
                           transition={{ duration: 0.2 }}
                           className="overflow-hidden"
                         >
-                          <div className="ml-4 lg:ml-8 mt-2 space-y-1 border-l-2 border-sky-500/20 pl-2 lg:pl-4">
+                          <div className="ml-3 lg:ml-8 mt-2 space-y-1 border-l-2 border-sky-500/20 pl-1 lg:pl-4">
                             {item.subItems.map((subItem) => {
                               const isSubActive = isSubItemActive(subItem.path);
                               const SubIcon = subItem.icon;
@@ -403,12 +416,12 @@ const Sidebar = () => {
                                 <Link
                                   key={subItem.path}
                                   to={subItem.path}
-                                  className="block group"
+                                  className="block group relative"
                                 >
                                   <motion.div
                                     whileHover={{ x: 4 }}
                                     whileTap={{ scale: 0.98 }}
-                                    className={`relative flex items-center gap-3 lg:gap-4 px-4 lg:px-5 py-3.5 lg:py-4 rounded-xl transition-all duration-200 ${
+                                    className={`relative flex items-center justify-center lg:justify-start gap-3 lg:gap-4 px-2 lg:px-5 py-3 lg:py-4 rounded-xl transition-all duration-200 ${
                                       isSubActive
                                         ? 'bg-sky-500/20 text-white'
                                         : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -422,13 +435,15 @@ const Sidebar = () => {
                                         }`}
                                       />
                                     )}
-                                    <span className="text-base font-semibold hidden lg:block">
-                                      {subItem.label}
-                                    </span>
-                                    <span className="text-sm font-semibold lg:hidden">
+                                    <span className="text-sm font-medium hidden lg:block">
                                       {subItem.label}
                                     </span>
                                   </motion.div>
+                                  {/* Tooltip for mobile */}
+                                  <div className="lg:hidden absolute left-full ml-4 px-3 py-2 bg-slate-800/95 backdrop-blur-sm text-white text-sm font-medium rounded-lg shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-50 top-1/2 -translate-y-1/2 border border-sky-500/20">
+                                    {subItem.label}
+                                    <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-slate-800" />
+                                  </div>
                                 </Link>
                               );
                             })}

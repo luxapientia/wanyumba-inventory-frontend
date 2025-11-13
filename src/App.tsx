@@ -8,7 +8,7 @@ import DiscoverMore from './pages/Properties/DiscoverMore';
 import AddProperty from './pages/Properties/AddProperty';
 import EditProperty from './pages/Properties/EditProperty';
 import PropertyDetail from './pages/Properties/PropertyDetail';
-import { Search } from './pages/Search';
+import { ManageProperties, PendingApproval, AdminPropertyDetail } from './pages/Admin';
 import { Analytics } from './pages/Analytics';
 import { Settings } from './pages/Settings';
 
@@ -24,7 +24,9 @@ function App() {
             <Route path="properties/:id/edit" element={<EditProperty />} />
             <Route path="properties/:id" element={<PropertyDetail />} />
             <Route path="properties/discover-more" element={<DiscoverMore />} />
-            <Route path="search" element={<Search />} />
+            <Route path="admin/properties" element={<ManageProperties />} />
+            <Route path="admin/properties/pending" element={<PendingApproval />} />
+            <Route path="admin/properties/:id" element={<AdminPropertyDetail />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="settings" element={<Settings />} />
             <Route path="*" element={<Navigate to="/" replace />} />

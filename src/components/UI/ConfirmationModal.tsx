@@ -12,6 +12,7 @@ export interface ConfirmationModalProps {
   cancelText?: string;
   variant?: 'danger' | 'warning' | 'info';
   loading?: boolean;
+  children?: React.ReactNode;
 }
 
 export default function ConfirmationModal({
@@ -24,6 +25,7 @@ export default function ConfirmationModal({
   cancelText = 'Cancel',
   variant = 'danger',
   loading = false,
+  children,
 }: ConfirmationModalProps) {
   const handleConfirm = () => {
     onConfirm();
@@ -108,9 +110,16 @@ export default function ConfirmationModal({
                 </h3>
 
                 {/* Message */}
-                <p className="text-gray-600 text-center mb-8 leading-relaxed text-base sm:text-lg">
+                <p className="text-gray-600 text-center mb-6 leading-relaxed text-base sm:text-lg">
                   {message}
                 </p>
+
+                {/* Additional Content (e.g., form fields) */}
+                {children && (
+                  <div className="mb-6">
+                    {children}
+                  </div>
+                )}
 
                 {/* Actions */}
                 <div className="flex flex-col-reverse sm:flex-row gap-3">

@@ -219,6 +219,33 @@ class PropertiesService {
   }
 
   /**
+   * Activate property - Admin action to approve and make property public (set status to ACTIVE)
+   */
+  async activateProperty(id: string): Promise<RealEstateProperty> {
+    const response = await apiClient.post<ApiResponse<RealEstateProperty>>(
+      `${this.API_PREFIX}/${id}/activate`
+    );
+    if (!response.data.success || !response.data.data) {
+      throw new Error(response.data.message || 'Failed to activate property');
+    }
+    return response.data.data;
+  }
+
+  /**
+   * Reject property - Admin action to reject property submission (set status to REJECTED)
+   */
+  async rejectProperty(id: string, rejectionReason: string): Promise<RealEstateProperty> {
+    const response = await apiClient.post<ApiResponse<RealEstateProperty>>(
+      `${this.API_PREFIX}/${id}/reject`,
+      { rejectionReason }
+    );
+    if (!response.data.success || !response.data.data) {
+      throw new Error(response.data.message || 'Failed to reject property');
+    }
+    return response.data.data;
+  }
+
+  /**
    * Get scraped properties by phone number with pagination, filtering, searching, and sorting.
    * Phone number is handled server-side (hardcoded for now).
    */
