@@ -6,6 +6,7 @@ import {
   Plus,
   ArrowUpRight,
   Sparkles,
+  Compass,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -229,15 +230,15 @@ export default function Dashboard() {
             </motion.div>
             <motion.div whileHover={{ x: 4 }} whileTap={{ scale: 0.98 }}>
               <Link
-                to="/search"
+                to="/properties/discover-more"
                 className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-xl hover:border-cyan-500 hover:bg-cyan-50/50 transition-all duration-300 group"
               >
                 <div className="p-2.5 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg shadow-md group-hover:scale-110 transition-transform">
-                  <TrendingUp className="w-5 h-5 text-white" />
+                  <Compass className="w-5 h-5 text-white" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-semibold text-gray-900">Search Properties</p>
-                  <p className="text-sm text-gray-500">Find properties</p>
+                  <p className="font-semibold text-gray-900">Discover More</p>
+                  <p className="text-sm text-gray-500">Explore new properties</p>
                 </div>
               </Link>
             </motion.div>
