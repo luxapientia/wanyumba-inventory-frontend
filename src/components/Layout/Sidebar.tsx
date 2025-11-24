@@ -50,10 +50,37 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
   ];
 
   const isItemActive = (item: typeof navItems[0]) => {
-    return (
-      location.pathname === item.path ||
-      (item.path !== '/' && location.pathname.startsWith(item.path))
-    );
+    const currentPath = location.pathname;
+    
+    // Exact match for root path
+    if (item.path === '/') {
+      return currentPath === '/';
+    }
+    
+    // Exact match
+    if (currentPath === item.path) {
+      return true;
+    }
+    
+    // For /properties, it should match /properties and /properties/:id and /properties/:id/edit
+    // But NOT /properties/new or /properties/discover-more
+    if (item.path === '/properties') {
+      return (
+        currentPath === '/properties' ||
+        (currentPath.startsWith('/properties/') && 
+         !currentPath.startsWith('/properties/new') &&
+         !currentPath.startsWith('/properties/discover-more'))
+      );
+    }
+    
+    // For specific paths like /properties/new and /properties/discover-more
+    // Only match exact path or paths that start with it followed by /
+    if (item.path === '/properties/new' || item.path === '/properties/discover-more') {
+      return currentPath === item.path || currentPath.startsWith(`${item.path}/`);
+    }
+    
+    // Default: check if current path starts with item path followed by /
+    return currentPath.startsWith(`${item.path}/`);
   };
 
   return (

@@ -41,7 +41,13 @@ const LocationPickerModal = ({
   initialLocation,
   onConfirm,
 }: LocationPickerModalProps) => {
-  const [tempLocation, setTempLocation] = useState(initialLocation || DEFAULT_LOCATION);
+  const [tempLocation, setTempLocation] = useState(() => {
+    const location = initialLocation || DEFAULT_LOCATION;
+    return {
+      lat: typeof location.lat === 'number' && !isNaN(location.lat) ? location.lat : DEFAULT_LOCATION.lat,
+      lng: typeof location.lng === 'number' && !isNaN(location.lng) ? location.lng : DEFAULT_LOCATION.lng,
+    };
+  });
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapLayer, setMapLayer] = useState<'street' | 'satellite'>('street');
   const [isFetchingLocation, setIsFetchingLocation] = useState(false);
@@ -54,7 +60,12 @@ const LocationPickerModal = ({
   // Update tempLocation when initialLocation changes
   useEffect(() => {
     if (isOpen) {
-      setTempLocation(initialLocation || DEFAULT_LOCATION);
+      const location = initialLocation || DEFAULT_LOCATION;
+      // Ensure lat and lng are valid numbers
+      setTempLocation({
+        lat: typeof location.lat === 'number' && !isNaN(location.lat) ? location.lat : DEFAULT_LOCATION.lat,
+        lng: typeof location.lng === 'number' && !isNaN(location.lng) ? location.lng : DEFAULT_LOCATION.lng,
+      });
     }
   }, [initialLocation, isOpen]);
 
@@ -118,7 +129,11 @@ const LocationPickerModal = ({
             // Handle marker drag
             marker.on('dragend', (e: LeafletDragEndEvent) => {
               const position = e.target.getLatLng();
-              setTempLocation({ lat: position.lat, lng: position.lng });
+              const lat = Number(position.lat);
+              const lng = Number(position.lng);
+              if (!isNaN(lat) && !isNaN(lng)) {
+                setTempLocation({ lat, lng });
+              }
             });
 
             // Store references
@@ -246,7 +261,11 @@ const LocationPickerModal = ({
   };
 
   const handleCancel = () => {
-    setTempLocation(initialLocation || DEFAULT_LOCATION);
+    const location = initialLocation || DEFAULT_LOCATION;
+    setTempLocation({
+      lat: typeof location.lat === 'number' && !isNaN(location.lat) ? location.lat : DEFAULT_LOCATION.lat,
+      lng: typeof location.lng === 'number' && !isNaN(location.lng) ? location.lng : DEFAULT_LOCATION.lng,
+    });
     onClose();
   };
 
@@ -255,14 +274,18 @@ const LocationPickerModal = ({
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          const newLocation = { lat: latitude, lng: longitude };
-          setTempLocation(newLocation);
-          
-          const map = mapInstanceRef.current;
-          map.setView([latitude, longitude], 15, { animate: true });
-          
-          const marker = markerRef.current;
-          marker.setLatLng([latitude, longitude]);
+          const lat = Number(latitude);
+          const lng = Number(longitude);
+          if (!isNaN(lat) && !isNaN(lng)) {
+            const newLocation = { lat, lng };
+            setTempLocation(newLocation);
+            
+            const map = mapInstanceRef.current;
+            map.setView([latitude, longitude], 15, { animate: true });
+            
+            const marker = markerRef.current;
+            marker.setLatLng([latitude, longitude]);
+          }
         },
         (error) => {
           console.error('Error getting location:', error);
@@ -353,7 +376,7 @@ const LocationPickerModal = ({
             <div className="min-w-0 flex-1">
               <p className="text-xs text-gray-500 mb-1">Selected Coordinates</p>
               <p className="text-sm sm:text-base font-mono font-medium text-gray-900 break-all">
-                {tempLocation.lat.toFixed(6)}, {tempLocation.lng.toFixed(6)}
+                {Number(tempLocation.lat).toFixed(6)}, {Number(tempLocation.lng).toFixed(6)}
               </p>
             </div>
           </div>

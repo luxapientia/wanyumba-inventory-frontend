@@ -7,7 +7,6 @@ import {
   Home,
   DollarSign,
   MapPin,
-  User,
   Building2,
   BedDouble,
   Bath,
@@ -28,9 +27,13 @@ import {
   Upload,
   Image as ImageIcon,
   Trash2,
+  CheckCircle2,
+  AlertCircle,
+  Navigation,
 } from 'lucide-react';
 import Button from '../../components/UI/Button.js';
 import Input from '../../components/UI/Input.js';
+import LocationPickerModal, { type LocationInfo } from '../../components/LocationPickerModal.js';
 import { useToast } from '../../contexts/index.js';
 import { useAppDispatch, useAppSelector } from '../../store/hooks.js';
 import { fetchPropertyTypes } from '../../store/thunks/propertiesThunks.js';
@@ -55,8 +58,6 @@ const DEFAULT_PROPERTY_TYPES = [
 ];
 
 const LISTING_TYPES = ['Sale', 'Rent'];
-
-const OWNER_TYPES = ['Owner', 'Agent', 'Developer'];
 
 const CURRENCIES = ['TZS', 'USD', 'EUR'];
 
@@ -120,6 +121,7 @@ export default function EditProperty() {
   const [filteredPropertyTypes, setFilteredPropertyTypes] = useState<string[]>(
     propertyTypes.length > 0 ? propertyTypes : DEFAULT_PROPERTY_TYPES
   );
+  const [isLocationPickerOpen, setIsLocationPickerOpen] = useState<boolean>(false);
 
   // Fetch property types from API on component mount
   useEffect(() => {
@@ -395,10 +397,7 @@ export default function EditProperty() {
         !formData.listingType ||
         !formData.address?.trim() ||
         !formData.price ||
-        formData.price <= 0 ||
-        !formData.contactName?.trim() ||
-        !formData.contactPhone?.trim() ||
-        !formData.contactEmail?.trim()
+        formData.price <= 0
       ) {
         setError('Please fill in all required fields');
         setLoading(false);
@@ -575,9 +574,6 @@ export default function EditProperty() {
                         formData.listingType,
                         formData.address?.trim(),
                         formData.price > 0,
-                        formData.contactName?.trim(),
-                        formData.contactPhone?.trim(),
-                        formData.contactEmail?.trim(),
                       ];
                       const filledCount = requiredFields.filter(Boolean).length;
                       return filledCount === requiredFields.length ? 'Ready to Update' : `${filledCount}/${requiredFields.length} Required`;
@@ -597,9 +593,6 @@ export default function EditProperty() {
                             formData.listingType,
                             formData.address?.trim(),
                             formData.price > 0,
-                            formData.contactName?.trim(),
-                            formData.contactPhone?.trim(),
-                            formData.contactEmail?.trim(),
                           ];
                           const filledCount = requiredFields.filter(Boolean).length;
                           return (filledCount / requiredFields.length) * 100;
@@ -1075,68 +1068,177 @@ export default function EditProperty() {
                 <h2 className="text-xl font-bold text-gray-900">Location</h2>
               </div>
 
-              <div className="space-y-5">
-                <Input
-                  label="Address *"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  placeholder="Street address"
-                  required
-                  fullWidth
-                />
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                  <Input
-                    label="Region"
-                    name="region"
-                    value={formData.region || ''}
-                    onChange={handleChange}
-                    placeholder="Region"
-                    fullWidth
-                  />
-
-                  <Input
-                    label="District"
-                    name="district"
-                    value={formData.district || ''}
-                    onChange={handleChange}
-                    placeholder="District"
-                    fullWidth
-                  />
-
-                  <Input
-                    label="Ward"
-                    name="ward"
-                    value={formData.ward || ''}
-                    onChange={handleChange}
-                    placeholder="Ward"
-                    fullWidth
-                  />
+              <div className="space-y-6">
+                {/* Location Picker - Prominent Call to Action */}
+                <div className="relative p-6 bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-50 rounded-xl border-2 border-sky-200">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="p-2 bg-sky-500 rounded-lg shadow-sm">
+                          <Navigation className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-bold text-gray-900">
+                            {formData.latitude && formData.longitude
+                              ? 'Location Selected ✓'
+                              : 'Select Property Location'}
+                          </h3>
+                          <p className="text-sm text-gray-600 mt-1">
+                            {formData.latitude && formData.longitude
+                              ? 'Click below to change the location'
+                              : 'Choose your property location on the interactive map'}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Status Indicator */}
+                      {formData.latitude && formData.longitude ? (
+                        <div className="flex items-center gap-2 mt-3 text-sm text-emerald-700">
+                          <CheckCircle2 className="w-4 h-4" />
+                          <span className="font-medium">Location coordinates set</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 mt-3 text-sm text-amber-700">
+                          <AlertCircle className="w-4 h-4" />
+                          <span className="font-medium">Location required - Please select on map</span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <Button
+                      type="button"
+                      variant={formData.latitude && formData.longitude ? 'outline' : 'primary'}
+                      size="lg"
+                      onClick={() => setIsLocationPickerOpen(true)}
+                      leftIcon={<MapPin size={20} />}
+                      className="whitespace-nowrap shadow-lg hover:shadow-xl transition-all"
+                    >
+                      {formData.latitude && formData.longitude ? 'Change Location' : 'Select on Map'}
+                    </Button>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <Input
-                    label="Latitude"
-                    name="latitude"
-                    type="number"
-                    step="any"
-                    value={formData.latitude || ''}
-                    onChange={handleChange}
-                    placeholder="e.g., -6.7924"
-                    fullWidth
-                  />
+                {/* Coordinates Display */}
+                {formData.latitude && formData.longitude && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200"
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <MapPin className="w-4 h-4 text-gray-600" />
+                      <span className="text-sm font-semibold text-gray-700">Coordinates</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1.5">Latitude</label>
+                        <div className="px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-900 font-mono text-sm">
+                          {Number(formData.latitude).toFixed(6)}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1.5">Longitude</label>
+                        <div className="px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-900 font-mono text-sm">
+                          {Number(formData.longitude).toFixed(6)}
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
 
-                  <Input
-                    label="Longitude"
-                    name="longitude"
-                    type="number"
-                    step="any"
-                    value={formData.longitude || ''}
-                    onChange={handleChange}
-                    placeholder="e.g., 39.2083"
-                    fullWidth
-                  />
+                {/* Address Information - Read-only Display */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 pb-2 border-b border-gray-200">
+                    <MapPin className="w-4 h-4 text-gray-500" />
+                    <h3 className="text-sm font-semibold text-gray-700">
+                      Address Information
+                      {formData.address && (
+                        <span className="ml-2 text-xs text-emerald-600 font-normal">
+                          (Auto-filled from map)
+                        </span>
+                      )}
+                    </h3>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Address <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <div className="px-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-900 min-h-[48px] flex items-center">
+                          {formData.address ? (
+                            <span className="text-sm">{formData.address}</span>
+                          ) : (
+                            <span className="text-sm text-gray-400 italic">
+                              Address will appear here after selecting location on map
+                            </span>
+                          )}
+                        </div>
+                        {!formData.address && (
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                            <AlertCircle className="w-4 h-4 text-amber-500" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Region
+                        </label>
+                        <div className="px-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-900 min-h-[48px] flex items-center">
+                          {formData.region ? (
+                            <span className="text-sm">{formData.region}</span>
+                          ) : (
+                            <span className="text-sm text-gray-400 italic">Not available</span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          District
+                        </label>
+                        <div className="px-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-900 min-h-[48px] flex items-center">
+                          {formData.district ? (
+                            <span className="text-sm">{formData.district}</span>
+                          ) : (
+                            <span className="text-sm text-gray-400 italic">Not available</span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Ward
+                        </label>
+                        <div className="px-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-900 min-h-[48px] flex items-center">
+                          {formData.ward ? (
+                            <span className="text-sm">{formData.ward}</span>
+                          ) : (
+                            <span className="text-sm text-gray-400 italic">Not available</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Helper Text */}
+                  {!formData.address && (
+                    <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                      <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-xs text-amber-800 font-medium mb-1">
+                          Location selection required
+                        </p>
+                        <p className="text-xs text-amber-700">
+                          Click the "Select on Map" button above to choose your property location. All address fields will be automatically filled from the map.
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -1318,101 +1420,6 @@ export default function EditProperty() {
               )}
             </motion.div>
 
-            {/* Contact Information */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-6 sm:p-8"
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-cyan-100 rounded-lg">
-                  <User className="w-5 h-5 text-cyan-600" />
-                </div>
-                <h2 className="text-xl font-bold text-gray-900">Contact Information</h2>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <Input
-                  label="Contact Name *"
-                  name="contactName"
-                  value={formData.contactName || ''}
-                  onChange={handleChange}
-                  placeholder="Full name"
-                  required
-                  fullWidth
-                />
-
-                <Input
-                  label="Contact Phone *"
-                  name="contactPhone"
-                  value={formData.contactPhone || ''}
-                  onChange={handleChange}
-                  placeholder="+255..."
-                  required
-                  fullWidth
-                />
-
-                <Input
-                  label="Contact Email *"
-                  name="contactEmail"
-                  type="email"
-                  value={formData.contactEmail || ''}
-                  onChange={handleChange}
-                  placeholder="email@example.com"
-                  required
-                  fullWidth
-                />
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Owner Type
-                  </label>
-                  <select
-                    name="ownerType"
-                    value={formData.ownerType}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-sky-500 focus:ring-4 focus:ring-sky-100 transition-all duration-200 focus:outline-none"
-                  >
-                    {OWNER_TYPES.map((type) => (
-                      <option key={type} value={type}>
-                        {type}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Expiration Date */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
-              className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-6 sm:p-8"
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-amber-100 rounded-lg">
-                  <Calendar className="w-5 h-5 text-amber-600" />
-                </div>
-                <h2 className="text-xl font-bold text-gray-900">Expiration</h2>
-              </div>
-
-              <div>
-                <Input
-                  label="Expiration Date"
-                  name="expiresAt"
-                  type="datetime-local"
-                  value={formData.expiresAt || ''}
-                  onChange={handleChange}
-                  placeholder="Select expiration date"
-                  fullWidth
-                />
-                <p className="text-gray-500 text-xs mt-2">
-                  Optional: Set when this property listing should expire
-                </p>
-              </div>
-            </motion.div>
 
             {/* Error Message */}
             {error && (
@@ -1429,7 +1436,7 @@ export default function EditProperty() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
+              transition={{ delay: 0.6 }}
               className="flex items-center justify-end gap-4 pt-4"
             >
               <Button
@@ -1446,6 +1453,29 @@ export default function EditProperty() {
             </motion.div>
           </div>
         </form>
+
+        {/* Location Picker Modal */}
+        <LocationPickerModal
+          isOpen={isLocationPickerOpen}
+          onClose={() => setIsLocationPickerOpen(false)}
+          initialLocation={{
+            lat: formData.latitude || -6.7924,
+            lng: formData.longitude || 39.2083,
+          }}
+          onConfirm={(locationInfo: LocationInfo) => {
+            setFormData((prev) => ({
+              ...prev,
+              latitude: locationInfo.lat,
+              longitude: locationInfo.lng,
+              // Auto-fill address fields from geocoding result
+              address: locationInfo.address || locationInfo.formatted_address || prev.address,
+              district: locationInfo.district || prev.district,
+              region: locationInfo.region || locationInfo.city || prev.region,
+              ward: locationInfo.ward || prev.ward,
+            }));
+            setIsLocationPickerOpen(false);
+          }}
+        />
       </motion.div>
     </div>
   );
