@@ -608,11 +608,11 @@ export default function PropertyDetail() {
                     )}
                   </div>
                 )}
-                {property.latitude && property.longitude && (
+                {property.latitude != null && property.longitude != null && (
                   <div className="p-4 bg-sky-50 rounded-xl border border-sky-100">
                     <p className="text-sm text-sky-600 font-semibold mb-2">Coordinates</p>
                     <p className="text-gray-700 font-mono text-sm">
-                      {property.latitude.toFixed(6)}, {property.longitude.toFixed(6)}
+                      {Number(property.latitude).toFixed(6)}, {Number(property.longitude).toFixed(6)}
                     </p>
                   </div>
                 )}
