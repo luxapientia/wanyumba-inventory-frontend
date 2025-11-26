@@ -10,14 +10,18 @@ export const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
   timeout: 30000, // 30 seconds
+  withCredentials: true, // REQUIRED: Send cookies in cross-origin requests
 });
 
 // Request interceptor
 apiClient.interceptors.request.use(
   (config) => {
-    // Add auth token if available
+    // Priority: Cookies (httpOnly) > localStorage token (fallback)
+    // Cookies are automatically sent with withCredentials: true
+    // Only add Authorization header if no cookie is available (backward compatibility)
     const token = localStorage.getItem('token');
-    if (token) {
+    if (token && !config.headers.Authorization) {
+      // Only add if Authorization header isn't already set (e.g., by cookie)
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -26,6 +30,19 @@ apiClient.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+// Wanyumba frontend URL for redirecting unauthorized users
+const WANYUMBA_FRONTEND_URL = import.meta.env.VITE_WANYUMBA_FRONTEND_URL || 'http://localhost:3000';
+const LOGIN_PATH = '/auth/login';
+
+/**
+ * Redirect to wanyumba-frontend login page
+ */
+const redirectToLogin = () => {
+  const loginUrl = `${WANYUMBA_FRONTEND_URL}${LOGIN_PATH}`;
+  // Use window.location.href for full page redirect (clears React state)
+  window.location.href = loginUrl;
+};
 
 // Response interceptor
 apiClient.interceptors.response.use(
@@ -37,7 +54,8 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       // Unauthorized - clear token and redirect to login
       localStorage.removeItem('token');
-      // You can add redirect logic here if needed
+      // Redirect to wanyumba-frontend login page
+      redirectToLogin();
     }
 
     return Promise.reject(error);

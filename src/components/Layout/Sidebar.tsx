@@ -32,18 +32,18 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
       label: 'My Properties',
       color: 'from-cyan-500 via-teal-500 to-emerald-600',
       glow: 'rgba(6, 182, 212, 0.3)',
-    },
-    {
-      path: '/properties/new',
+        },
+        {
+          path: '/properties/new',
       icon: Plus,
-      label: 'Add Property',
+          label: 'Add Property',
       color: 'from-emerald-500 via-teal-500 to-cyan-600',
       glow: 'rgba(16, 185, 129, 0.3)',
-    },
-    {
-      path: '/properties/discover-more',
+        },
+        {
+          path: '/properties/discover-more',
       icon: Compass,
-      label: 'Discover More',
+          label: 'Discover More',
       color: 'from-blue-500 via-indigo-500 to-purple-600',
       glow: 'rgba(59, 130, 246, 0.3)',
     },
@@ -65,7 +65,7 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
     // For /properties, it should match /properties and /properties/:id and /properties/:id/edit
     // But NOT /properties/new or /properties/discover-more
     if (item.path === '/properties') {
-      return (
+    return (
         currentPath === '/properties' ||
         (currentPath.startsWith('/properties/') && 
          !currentPath.startsWith('/properties/new') &&
@@ -87,146 +87,146 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
     <>
       {/* Desktop Sidebar - Always visible on lg+ */}
       <aside className="hidden lg:flex fixed top-0 left-0 h-screen flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 shadow-2xl w-64 xl:w-72 flex-shrink-0 z-40 border-r border-sky-500/20">
-        {/* Logo & Brand */}
-        <div className="flex-shrink-0 p-4 lg:p-6 border-b border-sky-500/20 relative overflow-hidden">
-          {/* Animated background */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute inset-0 bg-gradient-to-r from-sky-500 via-cyan-500 to-teal-500 animate-pulse"></div>
-          </div>
-
-          <div className="flex items-center lg:gap-3 justify-center lg:justify-start relative z-10">
-            <motion.div
-              className="relative p-2.5 lg:p-2 bg-gradient-to-br from-sky-500 via-blue-500 to-cyan-600 rounded-xl shadow-lg flex-shrink-0"
-              whileHover={{ scale: 1.1, rotate: [0, -10, 10, -10, 0] }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ duration: 0.5 }}
-            >
-              <Activity size={24} className="text-white relative z-10" />
-              <motion.div
-                className="absolute inset-0 rounded-xl bg-gradient-to-br from-sky-400 to-cyan-500"
-                animate={{
-                  opacity: [0.5, 0, 0],
-                  scale: [1, 1.5, 1],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
-              />
-            </motion.div>
-            <div className="hidden lg:block min-w-0 flex-1">
-              <h2 className="text-xl font-bold bg-gradient-to-r from-white via-sky-200 to-cyan-200 bg-clip-text text-transparent truncate">
-                Inventory
-              </h2>
-              <p className="text-xs text-sky-300/80 truncate font-medium">
-                Property Manager
-              </p>
-            </div>
-          </div>
+      {/* Logo & Brand */}
+      <div className="flex-shrink-0 p-4 lg:p-6 border-b border-sky-500/20 relative overflow-hidden">
+        {/* Animated background */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-gradient-to-r from-sky-500 via-cyan-500 to-teal-500 animate-pulse"></div>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 py-6 px-2 lg:px-3 overflow-y-auto overflow-x-hidden custom-scrollbar">
-          <div className="space-y-2">
-            {navItems.map((item, index) => {
-              const Icon = item.icon;
-              const isActive = isItemActive(item);
+        <div className="flex items-center lg:gap-3 justify-center lg:justify-start relative z-10">
+          <motion.div
+            className="relative p-2.5 lg:p-2 bg-gradient-to-br from-sky-500 via-blue-500 to-cyan-600 rounded-xl shadow-lg flex-shrink-0"
+            whileHover={{ scale: 1.1, rotate: [0, -10, 10, -10, 0] }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Activity size={24} className="text-white relative z-10" />
+            <motion.div
+              className="absolute inset-0 rounded-xl bg-gradient-to-br from-sky-400 to-cyan-500"
+              animate={{
+                opacity: [0.5, 0, 0],
+                scale: [1, 1.5, 1],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+            />
+          </motion.div>
+          <div className="hidden lg:block min-w-0 flex-1">
+            <h2 className="text-xl font-bold bg-gradient-to-r from-white via-sky-200 to-cyan-200 bg-clip-text text-transparent truncate">
+              Inventory
+            </h2>
+            <p className="text-xs text-sky-300/80 truncate font-medium">
+              Property Manager
+            </p>
+          </div>
+        </div>
+      </div>
 
-              return (
-                <motion.div
-                  key={item.path}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
+      {/* Navigation */}
+      <nav className="flex-1 py-6 px-2 lg:px-3 overflow-y-auto overflow-x-hidden custom-scrollbar">
+        <div className="space-y-2">
+          {navItems.map((item, index) => {
+            const Icon = item.icon;
+            const isActive = isItemActive(item);
+
+            return (
+              <motion.div
+                key={item.path}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
                   <Link to={item.path} className="block group relative">
-                    <motion.div
-                      whileHover={{ x: 4, scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="relative"
-                    >
-                      {/* Active indicator line with glow */}
-                      {isActive && (
-                        <motion.div
-                          layoutId="activeIndicator"
-                          className="absolute -left-2 top-0 bottom-0 w-1 bg-gradient-to-b from-sky-400 via-cyan-400 to-teal-500 rounded-r-full shadow-lg"
-                          style={{
-                            boxShadow: `0 0 10px ${item.glow}`,
-                          }}
-                          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                        />
-                      )}
-
-                      <div
-                        className={`relative flex items-center gap-3 px-3 lg:px-4 py-3.5 rounded-xl transition-all duration-300 overflow-hidden ${
-                          isActive
-                            ? 'bg-gradient-to-r from-sky-500/30 via-cyan-500/30 to-teal-500/30 text-white shadow-lg backdrop-blur-sm'
-                            : 'text-gray-400 hover:text-white hover:bg-white/5 backdrop-blur-sm'
-                        }`}
-                        style={
-                          isActive
-                            ? {
-                                boxShadow: `0 4px 20px ${item.glow}`,
-                              }
-                            : {}
-                        }
+                      <motion.div
+                        whileHover={{ x: 4, scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="relative"
                       >
-                        {/* Animated background for active state */}
+                        {/* Active indicator line with glow */}
                         {isActive && (
                           <motion.div
-                            className="absolute inset-0 bg-gradient-to-r from-sky-500/20 via-cyan-500/20 to-teal-500/20 animate-pulse"
-                            animate={{
-                              backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+                            layoutId="activeIndicator"
+                            className="absolute -left-2 top-0 bottom-0 w-1 bg-gradient-to-b from-sky-400 via-cyan-400 to-teal-500 rounded-r-full shadow-lg"
+                            style={{
+                              boxShadow: `0 0 10px ${item.glow}`,
                             }}
-                            transition={{
-                              duration: 5,
-                              repeat: Infinity,
-                              ease: 'linear',
-                            }}
+                            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                           />
                         )}
 
-                        {/* Icon with gradient background */}
                         <div
-                          className={`relative flex-shrink-0 p-2 rounded-lg transition-all duration-300 ${
+                          className={`relative flex items-center gap-3 px-3 lg:px-4 py-3.5 rounded-xl transition-all duration-300 overflow-hidden ${
                             isActive
-                              ? `bg-gradient-to-br ${item.color} shadow-lg`
-                              : 'bg-slate-700/50 group-hover:bg-slate-600/50'
+                              ? 'bg-gradient-to-r from-sky-500/30 via-cyan-500/30 to-teal-500/30 text-white shadow-lg backdrop-blur-sm'
+                              : 'text-gray-400 hover:text-white hover:bg-white/5 backdrop-blur-sm'
                           }`}
+                          style={
+                            isActive
+                              ? {
+                                  boxShadow: `0 4px 20px ${item.glow}`,
+                                }
+                              : {}
+                          }
                         >
-                          <Icon
-                            size={20}
-                            className={isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'}
-                          />
-
-                          {/* Pulse animation for active item */}
+                          {/* Animated background for active state */}
                           {isActive && (
                             <motion.div
-                              className={`absolute inset-0 rounded-lg bg-gradient-to-br ${item.color}`}
+                              className="absolute inset-0 bg-gradient-to-r from-sky-500/20 via-cyan-500/20 to-teal-500/20 animate-pulse"
                               animate={{
-                                scale: [1, 1.2, 1],
-                                opacity: [0.5, 0, 0],
+                                backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
                               }}
                               transition={{
-                                duration: 2,
+                                duration: 5,
                                 repeat: Infinity,
-                                ease: 'easeOut',
+                                ease: 'linear',
                               }}
                             />
                           )}
-                        </div>
+
+                          {/* Icon with gradient background */}
+                          <div
+                            className={`relative flex-shrink-0 p-2 rounded-lg transition-all duration-300 ${
+                              isActive
+                                ? `bg-gradient-to-br ${item.color} shadow-lg`
+                                : 'bg-slate-700/50 group-hover:bg-slate-600/50'
+                            }`}
+                          >
+                            <Icon
+                              size={20}
+                              className={isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'}
+                            />
+
+                            {/* Pulse animation for active item */}
+                            {isActive && (
+                              <motion.div
+                                className={`absolute inset-0 rounded-lg bg-gradient-to-br ${item.color}`}
+                                animate={{
+                                  scale: [1, 1.2, 1],
+                                  opacity: [0.5, 0, 0],
+                                }}
+                                transition={{
+                                  duration: 2,
+                                  repeat: Infinity,
+                                  ease: 'easeOut',
+                                }}
+                              />
+                            )}
+                          </div>
 
                         {/* Label - Visible on desktop */}
                         <div className="flex flex-col flex-1 min-w-0">
-                          <span
+                            <span
                             className={`font-semibold text-sm truncate ${
-                              isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'
-                            }`}
-                          >
-                            {item.label}
-                          </span>
-                        </div>
+                                isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'
+                              }`}
+                            >
+                              {item.label}
+                            </span>
+                          </div>
 
                         {/* Active indicator dot */}
                         {isActive && (
@@ -301,9 +301,9 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
                   />
                   All Systems Online
                 </p>
-              </div>
-            </div>
-          </motion.div>
+                          </div>
+                        </div>
+                      </motion.div>
         </div>
 
         {/* Footer */}
@@ -384,182 +384,182 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
                         onClick={onClose}
                         className="block group relative"
                       >
-                        <motion.div
-                          whileHover={{ x: 4, scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          className="relative"
+                      <motion.div
+                        whileHover={{ x: 4, scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="relative"
+                      >
+                        {/* Active indicator line with glow */}
+                        {isActive && (
+                          <motion.div
+                              layoutId="activeIndicatorMobile"
+                            className="absolute -left-2 top-0 bottom-0 w-1 bg-gradient-to-b from-sky-400 via-cyan-400 to-teal-500 rounded-r-full shadow-lg"
+                            style={{
+                              boxShadow: `0 0 10px ${item.glow}`,
+                            }}
+                            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                          />
+                        )}
+
+                        <div
+                            className={`relative flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 overflow-hidden ${
+                            isActive
+                              ? 'bg-gradient-to-r from-sky-500/30 via-cyan-500/30 to-teal-500/30 text-white shadow-lg backdrop-blur-sm'
+                              : 'text-gray-400 hover:text-white hover:bg-white/5 backdrop-blur-sm'
+                          }`}
+                          style={
+                            isActive
+                              ? {
+                                  boxShadow: `0 4px 20px ${item.glow}`,
+                                }
+                              : {}
+                          }
                         >
-                          {/* Active indicator line with glow */}
+                          {/* Animated background for active state */}
                           {isActive && (
                             <motion.div
-                              layoutId="activeIndicatorMobile"
-                              className="absolute -left-2 top-0 bottom-0 w-1 bg-gradient-to-b from-sky-400 via-cyan-400 to-teal-500 rounded-r-full shadow-lg"
-                              style={{
-                                boxShadow: `0 0 10px ${item.glow}`,
+                              className="absolute inset-0 bg-gradient-to-r from-sky-500/20 via-cyan-500/20 to-teal-500/20 animate-pulse"
+                              animate={{
+                                backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
                               }}
-                              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                              transition={{
+                                duration: 5,
+                                repeat: Infinity,
+                                ease: 'linear',
+                              }}
                             />
                           )}
 
+                          {/* Icon with gradient background */}
                           <div
-                            className={`relative flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 overflow-hidden ${
+                            className={`relative flex-shrink-0 p-2 rounded-lg transition-all duration-300 ${
                               isActive
-                                ? 'bg-gradient-to-r from-sky-500/30 via-cyan-500/30 to-teal-500/30 text-white shadow-lg backdrop-blur-sm'
-                                : 'text-gray-400 hover:text-white hover:bg-white/5 backdrop-blur-sm'
+                                ? `bg-gradient-to-br ${item.color} shadow-lg`
+                                : 'bg-slate-700/50 group-hover:bg-slate-600/50'
                             }`}
-                            style={
-                              isActive
-                                ? {
-                                    boxShadow: `0 4px 20px ${item.glow}`,
-                                  }
-                                : {}
-                            }
                           >
-                            {/* Animated background for active state */}
+                            <Icon
+                              size={20}
+                              className={isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'}
+                            />
+
+                            {/* Pulse animation for active item */}
                             {isActive && (
                               <motion.div
-                                className="absolute inset-0 bg-gradient-to-r from-sky-500/20 via-cyan-500/20 to-teal-500/20 animate-pulse"
+                                className={`absolute inset-0 rounded-lg bg-gradient-to-br ${item.color}`}
                                 animate={{
-                                  backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+                                  scale: [1, 1.2, 1],
+                                  opacity: [0.5, 0, 0],
                                 }}
                                 transition={{
-                                  duration: 5,
+                                  duration: 2,
                                   repeat: Infinity,
-                                  ease: 'linear',
-                                }}
-                              />
-                            )}
-
-                            {/* Icon with gradient background */}
-                            <div
-                              className={`relative flex-shrink-0 p-2 rounded-lg transition-all duration-300 ${
-                                isActive
-                                  ? `bg-gradient-to-br ${item.color} shadow-lg`
-                                  : 'bg-slate-700/50 group-hover:bg-slate-600/50'
-                              }`}
-                            >
-                              <Icon
-                                size={20}
-                                className={isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'}
-                              />
-
-                              {/* Pulse animation for active item */}
-                              {isActive && (
-                                <motion.div
-                                  className={`absolute inset-0 rounded-lg bg-gradient-to-br ${item.color}`}
-                                  animate={{
-                                    scale: [1, 1.2, 1],
-                                    opacity: [0.5, 0, 0],
-                                  }}
-                                  transition={{
-                                    duration: 2,
-                                    repeat: Infinity,
-                                    ease: 'easeOut',
-                                  }}
-                                />
-                              )}
-                            </div>
-
-                            {/* Label - Always visible on mobile drawer */}
-                            <div className="flex flex-col flex-1 min-w-0">
-                              <span
-                                className={`font-semibold text-sm truncate ${
-                                  isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'
-                                }`}
-                              >
-                                {item.label}
-                              </span>
-                            </div>
-
-                            {/* Active indicator dot */}
-                            {isActive && (
-                              <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                className="w-2 h-2 rounded-full bg-gradient-to-br from-sky-400 to-cyan-500 shadow-lg relative z-10"
-                                style={{
-                                  boxShadow: `0 0 10px ${item.glow}`,
+                                  ease: 'easeOut',
                                 }}
                               />
                             )}
                           </div>
 
-                          {/* Hover effect overlay */}
-                          {!isActive && (
-                            <motion.div
-                              className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                              initial={{ opacity: 0 }}
-                              whileHover={{ opacity: 1 }}
+                            {/* Label - Always visible on mobile drawer */}
+                            <div className="flex flex-col flex-1 min-w-0">
+                            <span
+                              className={`font-semibold text-sm truncate ${
+                                isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'
+                              }`}
                             >
-                              <div className={`absolute inset-0 rounded-xl bg-gradient-to-r ${item.color} opacity-10`} />
-                            </motion.div>
+                              {item.label}
+                            </span>
+                          </div>
+
+                          {/* Active indicator dot */}
+                          {isActive && (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                                className="w-2 h-2 rounded-full bg-gradient-to-br from-sky-400 to-cyan-500 shadow-lg relative z-10"
+                              style={{
+                                boxShadow: `0 0 10px ${item.glow}`,
+                              }}
+                            />
                           )}
-                        </motion.div>
-                      </Link>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </nav>
+                        </div>
 
-            {/* Stats Section */}
-            <div className="flex-shrink-0 p-4 border-t border-sky-500/20">
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="relative bg-gradient-to-br from-slate-800/50 to-slate-700/30 rounded-xl p-4 cursor-pointer group backdrop-blur-sm border border-sky-500/20 overflow-hidden"
-              >
-                {/* Animated background */}
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-teal-500/20 via-cyan-500/20 to-sky-500/20"
-                  animate={{
-                    backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
-                  }}
-                  transition={{
-                    duration: 5,
-                    repeat: Infinity,
-                    ease: 'linear',
-                  }}
-                />
-                <div className="flex items-center gap-3 relative z-10">
-                  <motion.div
-                    className="flex-shrink-0 p-2 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg shadow-md"
-                    whileHover={{ rotate: 360 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <TrendingUp size={18} className="text-white" />
-                  </motion.div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-sky-300/70 truncate font-medium">
-                      System Status
-                    </p>
-                    <p className="text-sm font-bold text-emerald-400 truncate flex items-center gap-1">
-                      <motion.span
-                        className="w-2 h-2 bg-green-400 rounded-full"
-                        animate={{
-                          scale: [1, 1.2, 1],
-                          opacity: [1, 0.7, 1],
-                        }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
-                      />
-                      All Systems Online
-                    </p>
-                  </div>
-                </div>
+                        {/* Hover effect overlay */}
+                        {!isActive && (
+                          <motion.div
+                            className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                            initial={{ opacity: 0 }}
+                            whileHover={{ opacity: 1 }}
+                          >
+                            <div className={`absolute inset-0 rounded-xl bg-gradient-to-r ${item.color} opacity-10`} />
+                          </motion.div>
+                        )}
+                      </motion.div>
+                                </Link>
               </motion.div>
-            </div>
+            );
+          })}
+        </div>
+      </nav>
 
-            {/* Footer */}
+      {/* Stats Section */}
+            <div className="flex-shrink-0 p-4 border-t border-sky-500/20">
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+                className="relative bg-gradient-to-br from-slate-800/50 to-slate-700/30 rounded-xl p-4 cursor-pointer group backdrop-blur-sm border border-sky-500/20 overflow-hidden"
+        >
+          {/* Animated background */}
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-teal-500/20 via-cyan-500/20 to-sky-500/20"
+            animate={{
+              backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+            }}
+            transition={{
+              duration: 5,
+              repeat: Infinity,
+              ease: 'linear',
+            }}
+          />
+                <div className="flex items-center gap-3 relative z-10">
+            <motion.div
+              className="flex-shrink-0 p-2 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg shadow-md"
+              whileHover={{ rotate: 360 }}
+              transition={{ duration: 0.5 }}
+            >
+              <TrendingUp size={18} className="text-white" />
+            </motion.div>
+                  <div className="flex-1 min-w-0">
+              <p className="text-xs text-sky-300/70 truncate font-medium">
+                System Status
+              </p>
+              <p className="text-sm font-bold text-emerald-400 truncate flex items-center gap-1">
+                <motion.span
+                  className="w-2 h-2 bg-green-400 rounded-full"
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    opacity: [1, 0.7, 1],
+                  }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                />
+                All Systems Online
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Footer */}
             <div className="flex-shrink-0 p-4 border-t border-sky-500/20">
               <div className="text-left">
                 <p className="text-xs font-semibold text-sky-300/60 truncate">
                   Version 1.0.0
-                </p>
+          </p>
                 <p className="text-[10px] text-sky-400/40 mt-1 truncate">
-                  © 2024 Wanyumba Inventory
-                </p>
-              </div>
-            </div>
+            © 2024 Wanyumba Inventory
+          </p>
+        </div>
+      </div>
           </motion.aside>
         )}
       </AnimatePresence>

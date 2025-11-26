@@ -1,13 +1,25 @@
+import { useEffect } from 'react';
 import { Bell, User, Search, Menu } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Input } from '../UI/index.js';
 import Button from '../UI/Button.js';
+import { useAppDispatch, useAppSelector } from '../../store/hooks.js';
+import { fetchCurrentUser } from '../../store/thunks/userThunks.js';
 
 interface HeaderProps {
   onMenuClick: () => void;
 }
 
 const Header = ({ onMenuClick }: HeaderProps) => {
+  const dispatch = useAppDispatch();
+  const { user, loading: userLoading } = useAppSelector((state) => state.user);
+
+  // Fetch user info on mount
+  useEffect(() => {
+    if (!user && !userLoading) {
+      dispatch(fetchCurrentUser());
+    }
+  }, [dispatch, user, userLoading]);
   return (
     <header className="bg-white/80 backdrop-blur-xl border-b border-gray-200/50 px-4 sm:px-6 py-3 sm:py-4 sticky top-0 z-30 shadow-sm">
       <div className="flex items-center justify-between gap-4">
@@ -68,15 +80,29 @@ const Header = ({ onMenuClick }: HeaderProps) => {
             whileHover={{ scale: 1.02 }}
           >
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-semibold text-gray-900">Admin User</p>
-              <p className="text-xs text-gray-500">Administrator</p>
+              <p className="text-sm font-semibold text-gray-900">
+                {userLoading ? 'Loading...' : user ? (user.firstName || user.lastName ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : user.email.split('@')[0]) : 'User'}
+              </p>
+              <p className="text-xs text-gray-500">
+                {user && user.roles && user.roles.length > 0 
+                  ? user.roles[0].charAt(0).toUpperCase() + user.roles[0].slice(1)
+                  : 'User'}
+              </p>
             </div>
             <motion.div
-              className="relative w-10 h-10 bg-gradient-to-br from-sky-600 via-blue-600 to-cyan-600 rounded-full flex items-center justify-center ring-2 ring-gray-200 flex-shrink-0 shadow-lg cursor-pointer"
+              className="relative w-10 h-10 bg-gradient-to-br from-sky-600 via-blue-600 to-cyan-600 rounded-full flex items-center justify-center ring-2 ring-gray-200 flex-shrink-0 shadow-lg cursor-pointer overflow-hidden"
               whileHover={{ scale: 1.1, rotate: 5 }}
               whileTap={{ scale: 0.95 }}
             >
-              <User size={20} className="text-white" />
+              {user?.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt={user.firstName || user.email}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User size={20} className="text-white" />
+              )}
               <motion.div
                 className="absolute inset-0 bg-gradient-to-br from-sky-400 to-cyan-500 rounded-full"
                 animate={{

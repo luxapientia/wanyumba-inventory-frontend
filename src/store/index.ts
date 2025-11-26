@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import propertiesReducer from './slices/propertiesSlice.js';
 import scrapedPropertiesReducer from './slices/scrapedPropertiesSlice.js';
+import userReducer from './slices/userSlice.js';
 
 const store = configureStore({
   reducer: {
     properties: propertiesReducer,
     scrapedProperties: scrapedPropertiesReducer,
+    user: userReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

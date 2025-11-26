@@ -1128,7 +1128,7 @@ export default function EditProperty() {
                     <div className="flex items-center gap-2 mb-3">
                       <MapPin className="w-4 h-4 text-gray-600" />
                       <span className="text-sm font-semibold text-gray-700">Coordinates</span>
-                    </div>
+                </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="block text-xs text-gray-500 mb-1.5">Latitude</label>
