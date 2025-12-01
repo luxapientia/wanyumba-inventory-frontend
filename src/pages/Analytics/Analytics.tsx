@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { BarChart3, TrendingUp, Activity } from 'lucide-react';
+import { BarChart3 } from 'lucide-react';
 
 export default function Analytics() {
   return (

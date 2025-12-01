@@ -37,7 +37,7 @@ export const fetchScrapedPropertiesByPhone = createAsyncThunk(
 
       dispatch(
         setScrapedProperties({
-          properties: response.properties,
+          properties: response.listings,
           total: response.pagination.total,
           page: response.pagination.page,
           limit: response.pagination.limit,

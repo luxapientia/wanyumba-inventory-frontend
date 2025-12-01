@@ -103,7 +103,8 @@ export default function AdminPropertyCard({
     }
   };
 
-  const badge = customBadge || (showStatusBadge && property.status ? statusConfig[property.status] : null);
+  const statusBadge = showStatusBadge && property.status ? statusConfig[property.status] : null;
+  const badge = customBadge || statusBadge;
 
   return (
     <motion.div
@@ -139,8 +140,8 @@ export default function AdminPropertyCard({
               {badge && (
                 <div
                   className={`absolute top-3 left-3 px-3 py-1.5 ${
-                    customBadge ? `bg-${customBadge.color}-500` : badge.bgColor
-                  } ${customBadge ? 'text-white' : badge.textColor} text-xs font-bold rounded-lg shadow-lg flex items-center gap-1.5`}
+                    customBadge ? `bg-${customBadge.color}-500` : (statusBadge?.bgColor || '')
+                  } ${customBadge ? 'text-white' : (statusBadge?.textColor || '')} text-xs font-bold rounded-lg shadow-lg flex items-center gap-1.5`}
                 >
                   {badge.icon}
                   <span>{badge.label}</span>

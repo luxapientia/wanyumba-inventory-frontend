@@ -75,7 +75,6 @@ const LocationPickerModal = ({
       const loadMap = async () => {
         try {
           // Dynamically import leaflet
-          // @ts-expect-error - leaflet types will be available after npm install
           const L = await import('leaflet');
           await import('leaflet/dist/leaflet.css');
 
@@ -187,7 +186,6 @@ const LocationPickerModal = ({
       }
 
       // Dynamically import leaflet for tile layer
-      // @ts-expect-error - leaflet types will be available after npm install
       import('leaflet').then((L) => {
         const newTileLayer = L.default.tileLayer(
           mapLayer === 'street'

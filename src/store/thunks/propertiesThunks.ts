@@ -10,7 +10,6 @@ import type { RootState } from '../index.js';
 import type {
   CreatePropertyDto,
   UpdatePropertyDto,
-  ScrapedPropertiesFilters,
 } from '../../api/types.js';
 
 /**
@@ -163,29 +162,6 @@ export const incrementViews = createAsyncThunk(
         error instanceof Error
           ? error.message
           : 'Failed to increment views';
-      dispatch(setError(message));
-      throw error;
-    }
-  }
-);
-
-/**
- * Get scraped properties by phone number with pagination, filtering, searching, and sorting.
- * Phone number is handled server-side.
- */
-export const fetchScrapedPropertiesByPhone = createAsyncThunk(
-  'properties/fetchScrapedByPhone',
-  async (filters: ScrapedPropertiesFilters = {}, { dispatch }) => {
-    dispatch(setLoading(true));
-    try {
-      const response = await propertiesService.getScrapedPropertiesByPhone(filters);
-      dispatch(setLoading(false));
-      return response;
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'Failed to fetch scraped properties';
       dispatch(setError(message));
       throw error;
     }
