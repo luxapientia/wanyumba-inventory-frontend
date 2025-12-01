@@ -49,6 +49,7 @@ export default function PropertyDetail() {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [publishModalOpen, setPublishModalOpen] = useState(false);
   const [publishing, setPublishing] = useState(false);
 
   useEffect(() => {
@@ -175,7 +176,11 @@ export default function PropertyDetail() {
     }
   };
 
-  const handlePublish = async () => {
+  const handlePublish = () => {
+    setPublishModalOpen(true);
+  };
+
+  const confirmPublish = async () => {
     if (!property || !id) return;
 
     try {
@@ -186,6 +191,7 @@ export default function PropertyDetail() {
         'Property Published',
         'The property has been published and is now pending review. It will be visible to the public once approved.'
       );
+      setPublishModalOpen(false);
     } catch (error) {
       console.error('Failed to publish property:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to publish property';
@@ -374,7 +380,7 @@ export default function PropertyDetail() {
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
-                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all m-2 ${
                       index === selectedImageIndex
                         ? 'border-sky-500 scale-105 shadow-md'
                         : 'border-gray-200 hover:border-sky-300'
@@ -792,6 +798,19 @@ export default function PropertyDetail() {
           />
         </div>
       )}
+
+      {/* Publish Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={publishModalOpen}
+        onClose={() => setPublishModalOpen(false)}
+        onConfirm={confirmPublish}
+        title="Publish Property"
+        message={`Are you sure you want to publish "${property?.title}"? The property will be submitted for review and will be visible to the public once approved by an admin.`}
+        confirmText="Publish"
+        cancelText="Cancel"
+        variant="info"
+        loading={publishing}
+      />
 
       {/* Delete Confirmation Modal */}
       <ConfirmationModal
