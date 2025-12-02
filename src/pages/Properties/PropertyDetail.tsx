@@ -411,7 +411,7 @@ export default function PropertyDetail() {
             >
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{property.title}</h1>
               {property.description && (
-                <p className="text-gray-600 leading-relaxed text-lg">{property.description}</p>
+                <p className="text-gray-600 leading-relaxed text-lg break-words whitespace-pre-wrap">{property.description}</p>
               )}
             </motion.div>
 

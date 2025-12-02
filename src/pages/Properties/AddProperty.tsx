@@ -144,7 +144,6 @@ export default function AddProperty() {
       latitude: undefined,
       longitude: undefined,
       features: undefined,
-      ownerId: 'temp-owner-id', // TODO: Get from auth when available
       ownerType: 'Owner',
       contactName: '',
       contactPhone: '',

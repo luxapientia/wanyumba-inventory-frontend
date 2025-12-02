@@ -91,7 +91,6 @@ export interface CreatePropertyDto {
   latitude?: number;
   longitude?: number;
   features?: Record<string, unknown>;
-  ownerId: string;
   ownerType: string;
   contactName?: string;
   contactPhone?: string;
