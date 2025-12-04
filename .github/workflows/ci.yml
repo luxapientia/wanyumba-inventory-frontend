@@ -187,6 +187,41 @@ jobs:
             pnpm install
           fi
 
+      - name: Check secrets availability (internal builds only)
+        if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+        run: |
+          [ -n "${{ secrets.VITE_WANYUMBA_FRONTEND_URL }}" ] || { echo "Missing VITE_WANYUMBA_FRONTEND_URL"; exit 1; }
+          [ -n "${{ secrets.VITE_API_URL }}" ] || { echo "Missing VITE_API_URL"; exit 1; }
+          [ -n "${{ secrets.VITE_GEOCODING_API_URL }}" ] || { echo "Missing VITE_GEOCODING_API_URL"; exit 1; }
+
+      - name: Create .env from GitHub Secrets (internal builds)
+        if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+        working-directory: ${{ needs.detect-project-path.outputs.project-path }}
+        run: |
+          PROJECT_PATH="${{ needs.detect-project-path.outputs.project-path }}"
+          echo "Working directory: $(pwd)"
+          echo "Project path: $PROJECT_PATH"
+          
+          touch .env || {
+            echo "Failed to create .env file"
+            exit 1
+          }
+          
+          [ -n "${{ secrets.VITE_WANYUMBA_FRONTEND_URL }}" ] && echo "VITE_WANYUMBA_FRONTEND_URL=${{ secrets.VITE_WANYUMBA_FRONTEND_URL }}" >> .env || true
+          [ -n "${{ secrets.VITE_API_URL }}" ] && echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> .env || true
+          [ -n "${{ secrets.VITE_GEOCODING_API_URL }}" ] && echo "VITE_GEOCODING_API_URL=${{ secrets.VITE_GEOCODING_API_URL }}" >> .env || true
+          
+          echo "✅ Created .env file with environment variables"
+          ls -la .env
+          echo "--- .env file contents (first 3 lines for verification) ---"
+          head -3 .env || echo "File is empty or doesn't exist"
+
+      - name: Note on fork PRs
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
+        run: |
+          echo "Fork PR detected: GitHub Secrets are not available to this workflow run."
+          echo "The build will proceed using defaults or .env.example values."
+
       - name: TypeScript type check and build
         working-directory: ${{ needs.detect-project-path.outputs.project-path }}
         run: pnpm run build
