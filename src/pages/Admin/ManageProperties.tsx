@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -39,7 +39,7 @@ export default function ManageProperties() {
   const [propertyType, setPropertyType] = useState<string>('');
   const [showFilters, setShowFilters] = useState(false);
 
-  const fetchProperties = async () => {
+  const fetchProperties = useCallback(async () => {
     try {
       setLoading(true);
       const status = filterStatus === 'ALL' ? undefined : filterStatus;
@@ -64,11 +64,11 @@ export default function ManageProperties() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filterStatus, page, limit, sortBy, sortOrder, search, propertyType, toast]);
 
   useEffect(() => {
     fetchProperties();
-  }, [filterStatus, page, limit, sortBy, sortOrder, search, propertyType]);
+  }, [fetchProperties]);
 
   const handleSearch = () => {
     setSearch(searchInput);
