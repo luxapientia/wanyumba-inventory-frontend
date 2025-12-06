@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, Grid3x3, List, Package } from 'lucide-react';
 import Button from '../../components/UI/Button.js';
-import { Input } from '../../components/UI/index.js';
+import { Input, Pagination } from '../../components/UI/index.js';
 import { useAppDispatch, useAppSelector } from '../../store/hooks.js';
 import { fetchScrapedPropertiesByPhone, fetchScrapedPropertyTypes } from '../../store/thunks/scrapedPropertiesThunks.js';
 import {
@@ -360,44 +360,20 @@ export default function DiscoverMore() {
             </div>
 
             {/* Pagination */}
-            {pages > 1 && (
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-4 sm:pt-6 border-t border-gray-200/60">
-                <div className="flex items-center gap-2 justify-center sm:justify-start">
-                  <span className="text-xs sm:text-sm text-gray-600 whitespace-nowrap">Items per page:</span>
-                  <select
-                    value={limit}
-                    onChange={(e) => handleLimitChange(parseInt(e.target.value, 10))}
-                    className="px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-sky-500 text-xs sm:text-sm font-medium bg-white"
-                  >
-                    <option value={10}>10</option>
-                    <option value={20}>20</option>
-                    <option value={50}>50</option>
-                    <option value={100}>100</option>
-                  </select>
-                </div>
-                <div className="flex items-center justify-center gap-2 sm:gap-3">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(page - 1)}
-                    disabled={page === 1}
-                    className="flex-1 sm:flex-initial min-w-[80px]"
-                  >
-                    Previous
-                  </Button>
-                  <span className="text-xs sm:text-sm text-gray-600 px-2 sm:px-4 whitespace-nowrap">
-                    Page {page} of {pages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(page + 1)}
-                    disabled={page >= pages}
-                    className="flex-1 sm:flex-initial min-w-[80px]"
-                  >
-                    Next
-                  </Button>
-                </div>
+            {(pages > 1 || true) && (
+              <div className="pt-4 sm:pt-6 border-t border-gray-200/60">
+                <Pagination
+                  page={page}
+                  pages={pages}
+                  total={total}
+                  limit={limit}
+                  onPageChange={handlePageChange}
+                  onLimitChange={handleLimitChange}
+                  colorScheme="sky"
+                  showItemsPerPage={true}
+                  showPageInfo={false}
+                  limitOptions={[10, 20, 50, 100]}
+                />
               </div>
             )}
           </div>

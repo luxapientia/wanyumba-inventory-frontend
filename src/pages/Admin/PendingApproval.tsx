@@ -6,12 +6,9 @@ import {
   Clock,
   Search,
   SlidersHorizontal,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
 } from 'lucide-react';
 import Button from '../../components/UI/Button.js';
+import { Pagination } from '../../components/UI/index.js';
 import { AdminPropertyCard } from '../../components/Admin/index.js';
 import { useToast } from '../../contexts/index.js';
 import propertiesService from '../../api/properties.service.js';
@@ -275,116 +272,21 @@ export default function PendingApproval() {
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-4 sm:p-6"
           >
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
-              {/* Left Side: Page Info & Items Per Page */}
-              <div className="flex flex-col sm:flex-row items-center gap-4">
-                {/* Page Info */}
-                <div className="text-sm text-gray-600">
-                  Showing <span className="font-semibold text-gray-900">{Math.min((page - 1) * limit + 1, total)}</span> to{' '}
-                  <span className="font-semibold text-gray-900">{Math.min(page * limit, total)}</span> of{' '}
-                  <span className="font-semibold text-gray-900">{total}</span> results
-                </div>
-
-                {/* Items Per Page Selector */}
-                <div className="flex items-center gap-2">
-                  <label className="text-sm font-semibold text-gray-600 whitespace-nowrap">Per Page:</label>
-                  <select
-                    value={limit}
-                    onChange={(e) => {
-                      setLimit(Number(e.target.value));
-                      setPage(1); // Reset to first page when changing limit
-                    }}
-                    className="px-3 py-1.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm font-medium bg-white hover:border-yellow-400 transition-all cursor-pointer"
-                  >
-                    <option value={10}>10</option>
-                    <option value={25}>25</option>
-                    <option value={50}>50</option>
-                    <option value={100}>100</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Right Side: Pagination Controls */}
-              <div className="flex items-center gap-2">
-                {/* First Page */}
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setPage(1)}
-                  disabled={page === 1}
-                  className="p-2 rounded-lg border-2 border-gray-300 hover:border-yellow-500 hover:bg-yellow-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-gray-300 disabled:hover:bg-transparent transition-all"
-                >
-                  <ChevronsLeft size={18} />
-                </motion.button>
-
-                {/* Previous Page */}
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                  className="p-2 rounded-lg border-2 border-gray-300 hover:border-yellow-500 hover:bg-yellow-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-gray-300 disabled:hover:bg-transparent transition-all"
-                >
-                  <ChevronLeft size={18} />
-                </motion.button>
-
-                {/* Page Numbers */}
-                {totalPages > 1 && (
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      let pageNum;
-                      if (totalPages <= 5) {
-                        pageNum = i + 1;
-                      } else if (page <= 3) {
-                        pageNum = i + 1;
-                      } else if (page >= totalPages - 2) {
-                        pageNum = totalPages - 4 + i;
-                      } else {
-                        pageNum = page - 2 + i;
-                      }
-
-                      return (
-                        <motion.button
-                          key={pageNum}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => setPage(pageNum)}
-                          className={`min-w-[40px] h-[40px] px-3 rounded-lg font-semibold transition-all ${
-                            page === pageNum
-                              ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg'
-                              : 'border-2 border-gray-300 hover:border-yellow-500 hover:bg-yellow-50'
-                          }`}
-                        >
-                          {pageNum}
-                        </motion.button>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {/* Next Page */}
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={page === totalPages}
-                  className="p-2 rounded-lg border-2 border-gray-300 hover:border-yellow-500 hover:bg-yellow-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-gray-300 disabled:hover:bg-transparent transition-all"
-                >
-                  <ChevronRight size={18} />
-                </motion.button>
-
-                {/* Last Page */}
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setPage(totalPages)}
-                  disabled={page === totalPages}
-                  className="p-2 rounded-lg border-2 border-gray-300 hover:border-yellow-500 hover:bg-yellow-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-gray-300 disabled:hover:bg-transparent transition-all"
-                >
-                  <ChevronsRight size={18} />
-                </motion.button>
-              </div>
-            </div>
+            <Pagination
+              page={page}
+              pages={totalPages}
+              total={total}
+              limit={limit}
+              onPageChange={setPage}
+              onLimitChange={(newLimit) => {
+                setLimit(newLimit);
+                setPage(1);
+              }}
+              colorScheme="yellow"
+              showItemsPerPage={true}
+              showPageInfo={true}
+              limitOptions={[10, 25, 50, 100]}
+            />
           </motion.div>
         )}
       </div>

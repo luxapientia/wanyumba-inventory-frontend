@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Search, Grid3x3, List, Plus, Package } from 'lucide-react';
 import Button from '../../components/UI/Button.js';
-import { Input, ConfirmationModal } from '../../components/UI/index.js';
+import { Input, ConfirmationModal, Pagination } from '../../components/UI/index.js';
 import { useToast } from '../../contexts/index.js';
 import { useAppDispatch, useAppSelector } from '../../store/hooks.js';
 import { fetchProperties, deleteProperty, fetchPropertyTypes } from '../../store/thunks/propertiesThunks.js';
@@ -289,42 +289,20 @@ export default function Properties() {
           </div>
 
           {/* Pagination */}
-          {pages > 1 && (
-            <div className="flex items-center justify-between pt-4 border-t border-gray-200 bg-white rounded-2xl shadow-sm border border-gray-200/50 p-6">
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">Items per page:</span>
-                <select
-                  value={limit}
-                  onChange={(e) => handleLimitChange(parseInt(e.target.value, 10))}
-                  className="px-3 py-1.5 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-sky-500 text-sm"
-                >
-                  <option value={10}>10</option>
-                  <option value={20}>20</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                </select>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(page - 1)}
-                  disabled={page === 1}
-                >
-                  Previous
-                </Button>
-                <span className="text-sm text-gray-600 px-4">
-                  Page {page} of {pages} ({total} total)
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(page + 1)}
-                  disabled={page >= pages}
-                >
-                  Next
-                </Button>
-              </div>
+          {(pages > 1 || true) && (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-4 sm:p-6">
+              <Pagination
+                page={page}
+                pages={pages}
+                total={total}
+                limit={limit}
+                onPageChange={handlePageChange}
+                onLimitChange={handleLimitChange}
+                colorScheme="sky"
+                showItemsPerPage={true}
+                showPageInfo={true}
+                limitOptions={[10, 20, 50, 100]}
+              />
             </div>
           )}
         </div>
