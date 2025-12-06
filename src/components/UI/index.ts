@@ -5,4 +5,5 @@ export { default as ConfirmationModal } from './ConfirmationModal.js';
 export type { ConfirmationModalProps } from './ConfirmationModal.js';
 export { default as Pagination } from './Pagination.js';
 export type { PaginationProps } from './Pagination.js';
+export { default as Map } from './Map.js';
 

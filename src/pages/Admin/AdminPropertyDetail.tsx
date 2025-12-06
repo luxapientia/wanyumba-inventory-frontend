@@ -36,7 +36,7 @@ import {
   Check,
 } from 'lucide-react';
 import Button from '../../components/UI/Button.js';
-import { ConfirmationModal } from '../../components/UI/index.js';
+import { ConfirmationModal, Map } from '../../components/UI/index.js';
 import { useToast } from '../../contexts/index.js';
 import propertiesService from '../../api/properties.service.js';
 import type { RealEstateProperty, PropertyStatus } from '../../api/types.js';
@@ -481,10 +481,17 @@ export default function AdminPropertyDetail() {
                       </div>
                     </div>
                     {(property.latitude && property.longitude) && (
-                      <div className="pt-3 border-t border-purple-200/50">
-                        <p className="text-xs text-gray-600 mb-1 font-medium">Coordinates</p>
-                        <p className="text-sm text-gray-700 font-mono">
-                          {property.latitude.toFixed(6)}, {property.longitude.toFixed(6)}
+                      <div className="pt-3 border-t border-purple-200/50 mt-3">
+                        <p className="text-xs text-gray-600 mb-2 font-medium">Location Map:</p>
+                        <Map
+                          latitude={Number(property.latitude)}
+                          longitude={Number(property.longitude)}
+                          address={property.address}
+                          title={property.title}
+                          height="300px"
+                        />
+                        <p className="text-xs text-gray-500 mt-2 font-mono">
+                          Coordinates: {property.latitude.toFixed(6)}, {property.longitude.toFixed(6)}
                         </p>
                       </div>
                     )}

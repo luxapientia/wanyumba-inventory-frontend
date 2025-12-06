@@ -33,7 +33,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import Button from '../../components/UI/Button.js';
-import { ConfirmationModal } from '../../components/UI/index.js';
+import { ConfirmationModal, Map } from '../../components/UI/index.js';
 import { useToast } from '../../contexts/index.js';
 import propertiesService from '../../api/properties.service.js';
 import type { RealEstateProperty, PropertyStatus } from '../../api/types.js';
@@ -615,10 +615,17 @@ export default function PropertyDetail() {
                   </div>
                 )}
                 {property.latitude != null && property.longitude != null && (
-                  <div className="p-4 bg-sky-50 rounded-xl border border-sky-100">
-                    <p className="text-sm text-sky-600 font-semibold mb-2">Coordinates</p>
-                    <p className="text-gray-700 font-mono text-sm">
-                      {Number(property.latitude).toFixed(6)}, {Number(property.longitude).toFixed(6)}
+                  <div className="mt-4">
+                    <p className="text-sm text-sky-600 font-semibold mb-2">Location Map:</p>
+                    <Map
+                      latitude={Number(property.latitude)}
+                      longitude={Number(property.longitude)}
+                      address={property.address}
+                      title={property.title}
+                      height="300px"
+                    />
+                    <p className="text-xs text-gray-500 mt-2 font-mono">
+                      Coordinates: {Number(property.latitude).toFixed(6)}, {Number(property.longitude).toFixed(6)}
                     </p>
                   </div>
                 )}
