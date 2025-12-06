@@ -215,7 +215,7 @@ export interface ScrapedProperty {
 
 // Scraped Properties Response
 export interface ScrapedPropertiesResponse {
-  listings: ScrapedProperty[];
+  properties: ScrapedProperty[];
   pagination: PaginationMeta;
 }
 
