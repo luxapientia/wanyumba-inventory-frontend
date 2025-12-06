@@ -18,22 +18,25 @@ const redirectToLogin = () => {
 /**
  * Check if response indicates unauthorized access
  */
-const isUnauthorizedResponse = (response: any): boolean => {
-  if (!response) return false;
+const isUnauthorizedResponse = (response: unknown): boolean => {
+  if (!response || typeof response !== 'object') return false;
+  
+  const resp = response as Record<string, unknown>;
   
   // Check for unauthorized error in response data
-  if (response.error) {
-    const error = response.error;
+  if (resp.error) {
+    const error = resp.error as Record<string, unknown>;
     if (error.type === 'UNAUTHORIZED' || 
-        error.message?.toLowerCase().includes('unauthorized') ||
-        error.message?.toLowerCase().includes('no token')) {
+        (typeof error.message === 'string' && 
+         (error.message.toLowerCase().includes('unauthorized') ||
+          error.message.toLowerCase().includes('no token')))) {
       return true;
     }
   }
   
   // Check if success is false and message indicates unauthorized
-  if (response.success === false) {
-    const message = response.message?.toLowerCase() || '';
+  if (resp.success === false) {
+    const message = typeof resp.message === 'string' ? resp.message.toLowerCase() : '';
     if (message.includes('unauthorized') || message.includes('no token')) {
       return true;
     }
@@ -69,23 +72,25 @@ export const fetchCurrentUser = createAsyncThunk(
       } else {
         throw new Error(response.message || 'Failed to fetch user');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       // HTTP 401 errors are handled by axios interceptor (which redirects)
       // But we also check response data for unauthorized indicators
-      if (error.response && error.response.status === 401) {
+      const axiosError = error as { response?: { status?: number; data?: unknown }; message?: string };
+      if (axiosError.response && axiosError.response.status === 401) {
         // Axios interceptor will handle redirect, but clear state here
         dispatch(clearUser());
         return;
       }
       
       // Check if error response data indicates unauthorized
-      if (isUnauthorizedResponse(error.response?.data)) {
+      if (isUnauthorizedResponse(axiosError.response?.data)) {
         dispatch(clearUser());
         redirectToLogin();
         return;
       }
       
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch user';
+      const errorResponse = axiosError.response?.data as { message?: string } | undefined;
+      const errorMessage = errorResponse?.message || axiosError.message || 'Failed to fetch user';
       dispatch(setError(errorMessage));
       throw error;
     }

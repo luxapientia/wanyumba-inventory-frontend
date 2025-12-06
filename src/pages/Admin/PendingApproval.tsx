@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
@@ -32,7 +32,7 @@ export default function PendingApproval() {
   const [propertyType, setPropertyType] = useState<string>('');
   const [showFilters, setShowFilters] = useState(false);
 
-  const fetchProperties = async () => {
+  const fetchProperties = useCallback(async () => {
     try {
       setLoading(true);
       const response = await propertiesService.getProperties({
@@ -56,11 +56,11 @@ export default function PendingApproval() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, limit, sortBy, sortOrder, search, propertyType, toast]);
 
   useEffect(() => {
     fetchProperties();
-  }, [page, limit, sortBy, sortOrder, search, propertyType]);
+  }, [fetchProperties]);
 
   const handleSearch = () => {
     setSearch(searchInput);

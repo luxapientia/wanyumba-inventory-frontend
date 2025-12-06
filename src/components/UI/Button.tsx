@@ -108,10 +108,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     if (as === 'a' && href) {
       const {
-        onAnimationStart,
-        onDrag,
-        onDragStart,
-        onDragEnd,
+        onAnimationStart: _onAnimationStart,
+        onDrag: _onDrag,
+        onDragStart: _onDragStart,
+        onDragEnd: _onDragEnd,
         ...anchorProps
       } = props as React.AnchorHTMLAttributes<HTMLAnchorElement>;
       return (

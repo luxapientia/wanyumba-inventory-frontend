@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { AlertCircle } from 'lucide-react';
 
 interface InputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'onDrag' | 'onDragStart' | 'onDragEnd' | 'onAnimationStart'> {
   label?: string;
   error?: string;
   helperText?: string;
@@ -101,7 +101,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             whileFocus={{ scale: 1.01 }}
             className={`${baseClasses} ${variants[variant]} ${sizes[inputSize]} ${paddingWithIcon} ${errorClasses} ${className}`}
             disabled={disabled}
-            {...(props as any)}
+            {...props}
           />
 
           {/* Icon - Right or Error Icon */}

@@ -18,7 +18,7 @@ import type { ScrapedProperty } from '../../api/types.js';
 
 export default function DiscoverMore() {
   const dispatch = useAppDispatch();
-  const scrapedPropertiesState = useAppSelector((state: any) => state.scrapedProperties);
+  const scrapedPropertiesState = useAppSelector((state) => state.scrapedProperties);
   const {
     items: scrapedListings,
     total,
@@ -52,8 +52,8 @@ export default function DiscoverMore() {
     sortBy,
     sortOrder,
     filters.source,
-    (filters as any).propertyType,
-    (filters as any).listingType,
+    filters.propertyType,
+    filters.listingType,
     filters.minPrice,
     filters.maxPrice,
     search,
@@ -169,13 +169,13 @@ export default function DiscoverMore() {
           {/* Property Type Filter */}
           <div className="flex items-center gap-2 flex-1 sm:flex-initial min-w-[140px]">
             <select
-              value={(filters as any).propertyType || ''}
+              value={filters.propertyType || ''}
               onChange={(e) =>
                 dispatch(
                   setScrapedFilters({
                     propertyType: e.target.value || undefined,
                     page: 1,
-                  } as any)
+                  })
                 )
               }
               className="flex-1 px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-100 transition-all text-sm font-medium bg-white"
@@ -192,13 +192,13 @@ export default function DiscoverMore() {
           {/* Listing Type Filter */}
           <div className="flex items-center gap-2 flex-1 sm:flex-initial min-w-[140px]">
             <select
-              value={(filters as any).listingType || ''}
+              value={filters.listingType || ''}
               onChange={(e) =>
                 dispatch(
                   setScrapedFilters({
                     listingType: e.target.value || undefined,
                     page: 1,
-                  } as any)
+                  })
                 )
               }
               className="flex-1 px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-100 transition-all text-sm font-medium bg-white"

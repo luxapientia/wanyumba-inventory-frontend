@@ -4,12 +4,12 @@ import Modal from './UI/Modal.js';
 import Button from './UI/Button.js';
 import { geocodingService } from '../api/index.js';
 import type { GeocodingResult } from '../api/geocoding.service.js';
+import type { Map, Marker, TileLayer, DragEndEvent } from 'leaflet';
 
-// Type definitions for Leaflet (will be available after npm install)
-type LeafletMap = any;
-type LeafletMarker = any;
-type LeafletTileLayer = any;
-type LeafletDragEndEvent = any;
+type LeafletMap = Map;
+type LeafletMarker = Marker;
+type LeafletTileLayer = TileLayer;
+type LeafletDragEndEvent = DragEndEvent;
 
 export interface LocationInfo {
   lat: number;
@@ -79,7 +79,7 @@ const LocationPickerModal = ({
           await import('leaflet/dist/leaflet.css');
 
           // Fix for default marker icon issue in Leaflet
-          delete (L.Icon.Default.prototype as any)._getIconUrl;
+          delete (L.Icon.Default.prototype as { _getIconUrl?: unknown })._getIconUrl;
           L.Icon.Default.mergeOptions({
             iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
             iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
@@ -279,10 +279,14 @@ const LocationPickerModal = ({
             setTempLocation(newLocation);
             
             const map = mapInstanceRef.current;
-            map.setView([latitude, longitude], 15, { animate: true });
+            if (map) {
+              map.setView([latitude, longitude], 15, { animate: true });
+            }
             
             const marker = markerRef.current;
-            marker.setLatLng([latitude, longitude]);
+            if (marker) {
+              marker.setLatLng([latitude, longitude]);
+            }
           }
         },
         (error) => {
