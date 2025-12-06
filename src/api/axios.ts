@@ -34,7 +34,7 @@ apiClient.interceptors.request.use(
 );
 
 // Wanyumba frontend URL for redirecting unauthorized users
-const WANYUMBA_FRONTEND_URL = import.meta.env.VITE_WANYUMBA_FRONTEND_URL || 'http://localhost:3000';
+const WANYUMBA_FRONTEND_URL = import.meta.env.VITE_WANYUMBA_FRONTEND_URL || 'http://localhost:8080';
 const LOGIN_PATH = '/auth';
 
 /**
