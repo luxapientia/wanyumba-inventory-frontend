@@ -28,7 +28,7 @@ class UserService {
    * Calls the inventory management service user endpoint
    */
   async getCurrentUser(): Promise<UserResponse> {
-    const response = await apiClient.get('/user/me');
+    const response = await apiClient.get('/inventory/user/me');
     return response.data;
   }
 }

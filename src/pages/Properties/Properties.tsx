@@ -289,7 +289,7 @@ export default function Properties() {
           </div>
 
           {/* Pagination */}
-          {pages > 1 && (
+          {(pages > 1 || true) && (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-4 sm:p-6">
               <Pagination
                 page={page}

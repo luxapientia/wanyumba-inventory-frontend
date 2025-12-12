@@ -66,8 +66,11 @@ class GeocodingService {
 
   constructor() {
     // Geocoding service URL - can be configured via environment variable
+    // IMPORTANT: All API calls go through the API Gateway (Traefik)
+    // Default to Traefik gateway URL (port 80)
+    // Traefik routes /api/v1/geocoding/* to geocoding service (port 8001)
     const GEOCODING_API_URL =
-      import.meta.env.VITE_GEOCODING_API_URL || 'http://localhost:8001/api/v1';
+      import.meta.env.VITE_GEOCODING_API_URL || 'http://localhost/api/v1';
 
     // Create axios instance for geocoding service
     this.apiClient = axios.create({

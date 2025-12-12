@@ -14,7 +14,7 @@ import type {
  * Handles all API calls related to property management
  */
 class PropertiesService {
-  private readonly API_PREFIX = '/properties';
+  private readonly API_PREFIX = '/inventory/properties';
 
   /**
    * Create a new property

@@ -34,13 +34,14 @@ export interface RealEstateProperty {
   description: string;
   propertyType: string;
   listingType: string;
+  rentalType?: string; // residential, short-term, holiday (only for rent listings)
   status: PropertyStatus;
-  price: number;
+  price: number | string;
   currency: string;
   bedrooms?: number;
   bathrooms?: number;
-  size?: number;
-  landSize?: number;
+  size?: number | string;
+  landSize?: number | string;
   floor?: number;
   totalFloors?: number;
   yearBuilt?: number;
@@ -48,8 +49,8 @@ export interface RealEstateProperty {
   district?: string;
   region?: string;
   ward?: string;
-  latitude?: number;
-  longitude?: number;
+  latitude?: number | string;
+  longitude?: number | string;
   features?: Record<string, unknown>;
   ownerId: string;
   ownerType: string;
@@ -75,6 +76,7 @@ export interface CreatePropertyDto {
   description?: string;
   propertyType: string;
   listingType: string;
+  rentalType?: string; // residential, short-term, holiday (only for rent listings)
   price: number;
   currency?: string;
   bedrooms?: number;
@@ -105,6 +107,7 @@ export interface UpdatePropertyDto {
   description?: string;
   propertyType?: string;
   listingType?: string;
+  rentalType?: string; // residential, short-term, holiday (only for rent listings)
   status?: PropertyStatus;
   price?: number;
   currency?: string;

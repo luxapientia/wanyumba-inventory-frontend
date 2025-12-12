@@ -128,6 +128,7 @@ export default function AddProperty() {
       description: '',
       propertyType: '',
       listingType: '',
+      rentalType: '',
       price: 0,
       currency: 'TZS',
       bedrooms: undefined,
@@ -956,7 +957,15 @@ export default function AddProperty() {
                     <select
                       name="listingType"
                       value={formData.listingType}
-                      onChange={handleChange}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setFormData((prev) => ({
+                          ...prev,
+                          listingType: value,
+                          // Clear rentalType when listingType changes from rent to sale
+                          rentalType: value === 'rent' ? prev.rentalType : '',
+                        }));
+                      }}
                       required
                       className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-sky-500 focus:ring-4 focus:ring-sky-100 transition-all duration-200 focus:outline-none"
                     >
@@ -969,6 +978,28 @@ export default function AddProperty() {
                     </select>
                   </div>
                 </div>
+
+                {/* Rental Type - Only show when listingType is rent */}
+                {formData.listingType === 'rent' && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Rental Type
+                    </label>
+                    <select
+                      name="rentalType"
+                      value={formData.rentalType}
+                      onChange={(e) => {
+                        setFormData((prev) => ({ ...prev, rentalType: e.target.value }));
+                      }}
+                      className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-sky-500 focus:ring-4 focus:ring-sky-100 transition-all duration-200 focus:outline-none"
+                    >
+                      <option value="">Select rental type</option>
+                      <option value="residential">Residential</option>
+                      <option value="short-term">Short term</option>
+                      <option value="holiday">Holiday</option>
+                    </select>
+                  </div>
+                )}
               </div>
             </motion.div>
 

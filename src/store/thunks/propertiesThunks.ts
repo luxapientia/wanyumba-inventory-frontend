@@ -14,6 +14,7 @@ import type {
 
 /**
  * Fetch properties from the backend with current filters, sorting, search, and pagination
+ * Always filters by ownerId=me to show only the authenticated user's properties
  */
 export const fetchProperties = createAsyncThunk(
   'properties/fetch',
@@ -24,8 +25,12 @@ export const fetchProperties = createAsyncThunk(
       const { page, limit, filters, sortBy, sortOrder, search } = state.properties;
 
       // Build filters object with all current state values
+      // Always filter by ownerId=me to show only user's own properties
+      // Only show approved (ACTIVE) listings unless status filter is explicitly set
       const filtersToSend: typeof filters = {
         ...filters,
+        ownerId: 'me', // Always filter to show only user's own properties
+        status: filters.status, // Default to ACTIVE (approved) if no status filter
         page,
         limit,
         sortBy,

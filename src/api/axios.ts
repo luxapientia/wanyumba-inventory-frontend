@@ -1,9 +1,10 @@
 import axios from 'axios';
 
 // API base URL - can be configured via environment variable
-// Default: Direct connection to inventory service on port 3008 (no /api/v1 prefix needed)
-// Alternative: Use Traefik gateway: http://localhost/api/v1
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3008';
+// IMPORTANT: All API calls go through the API Gateway (Traefik)
+// Default to Traefik gateway URL (port 80)
+// Traefik routes /api/v1/inventory/* to inventory service (port 3008) - Note: /inventory prefix is stripped by Traefik
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost/api/v1';
 
 // Create axios instance
 export const apiClient = axios.create({

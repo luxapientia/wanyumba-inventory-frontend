@@ -87,6 +87,7 @@ export default function EditProperty() {
     description: '',
     propertyType: '',
     listingType: '',
+    rentalType: '',
     price: 0,
     currency: 'TZS',
     bedrooms: undefined,
@@ -161,18 +162,30 @@ export default function EditProperty() {
         const propertyData = await propertiesService.getPropertyById(id);
         setProperty(propertyData);
 
+        // Helper function to convert Decimal (string) or number to number
+        const toNumber = (value: string | number | undefined | null): number | undefined => {
+          if (value === undefined || value === null) return undefined;
+          if (typeof value === 'number') return value;
+          if (typeof value === 'string') {
+            const num = parseFloat(value);
+            return isNaN(num) ? undefined : num;
+          }
+          return undefined;
+        };
+
         // Populate form data
         setFormData({
           title: propertyData.title || '',
           description: propertyData.description || '',
           propertyType: propertyData.propertyType || '',
           listingType: propertyData.listingType || '',
-          price: propertyData.price || 0,
+          rentalType: propertyData.rentalType || '',
+          price: toNumber(propertyData.price) ?? 0,
           currency: propertyData.currency || 'TZS',
           bedrooms: propertyData.bedrooms ?? undefined,
           bathrooms: propertyData.bathrooms ?? undefined,
-          size: propertyData.size ?? undefined,
-          landSize: propertyData.landSize ?? undefined,
+          size: toNumber(propertyData.size),
+          landSize: toNumber(propertyData.landSize),
           floor: propertyData.floor ?? undefined,
           totalFloors: propertyData.totalFloors ?? undefined,
           yearBuilt: propertyData.yearBuilt ?? undefined,
@@ -180,8 +193,8 @@ export default function EditProperty() {
           district: propertyData.district || '',
           region: propertyData.region || '',
           ward: propertyData.ward || '',
-          latitude: propertyData.latitude ?? undefined,
-          longitude: propertyData.longitude ?? undefined,
+          latitude: toNumber(propertyData.latitude),
+          longitude: toNumber(propertyData.longitude),
           features: propertyData.features as Record<string, unknown> | undefined,
           ownerType: propertyData.ownerType || 'Owner',
           contactName: propertyData.contactName || '',
@@ -213,7 +226,8 @@ export default function EditProperty() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData((prev) => {
+      const updated = {
       ...prev,
       [name]:
         name === 'price' ||
@@ -228,7 +242,13 @@ export default function EditProperty() {
         name === 'longitude'
           ? value === '' ? undefined : Number(value)
           : value,
-    }));
+      };
+      // Clear rentalType when listingType changes from rent to sale
+      if (name === 'listingType' && value !== 'rent') {
+        updated.rentalType = '';
+      }
+      return updated;
+    });
     setError(null);
     
     // Filter property types when typing in propertyType field
@@ -907,6 +927,26 @@ export default function EditProperty() {
                     </select>
                   </div>
                 </div>
+
+                {/* Rental Type - Only show when listingType is rent */}
+                {formData.listingType === 'rent' && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Rental Type
+                    </label>
+                    <select
+                      name="rentalType"
+                      value={formData.rentalType}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-sky-500 focus:ring-4 focus:ring-sky-100 transition-all duration-200 focus:outline-none"
+                    >
+                      <option value="">Select rental type</option>
+                      <option value="residential">Residential</option>
+                      <option value="short-term">Short term</option>
+                      <option value="holiday">Holiday</option>
+                    </select>
+                  </div>
+                )}
               </div>
             </motion.div>
 

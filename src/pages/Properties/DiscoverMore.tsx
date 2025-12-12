@@ -360,7 +360,7 @@ export default function DiscoverMore() {
             </div>
 
             {/* Pagination */}
-            {pages > 1 && (
+            {(pages > 1 || true) && (
               <div className="pt-4 sm:pt-6 border-t border-gray-200/60">
                 <Pagination
                   page={page}
