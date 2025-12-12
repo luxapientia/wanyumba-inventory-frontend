@@ -79,9 +79,11 @@ export default function AdminPropertyCard({
   borderColor = 'gray-200/50',
   hoverBorderColor = 'gray-300/80',
 }: AdminPropertyCardProps) {
-  const formatPrice = (price?: number, currency?: string) => {
+  const formatPrice = (price?: number | string, currency?: string) => {
     if (!price) return 'Price on request';
-    return `${currency || 'TZS'} ${price.toLocaleString()}`;
+    const numPrice = typeof price === 'string' ? parseFloat(price) : price;
+    if (isNaN(numPrice)) return 'Price on request';
+    return `${currency || 'TZS'} ${numPrice.toLocaleString()}`;
   };
 
   const formatDate = (dateString?: string) => {

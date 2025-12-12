@@ -491,7 +491,7 @@ export default function AdminPropertyDetail() {
                           height="300px"
                         />
                         <p className="text-xs text-gray-500 mt-2 font-mono">
-                          Coordinates: {property.latitude.toFixed(6)}, {property.longitude.toFixed(6)}
+                          Coordinates: {Number(property.latitude).toFixed(6)}, {Number(property.longitude).toFixed(6)}
                         </p>
                       </div>
                     )}
