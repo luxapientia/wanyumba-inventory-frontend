@@ -10,6 +10,24 @@ import type {
 } from './types.js';
 
 /**
+ * Dashboard Statistics Interface
+ */
+export interface DashboardStats {
+  totalProperties: number;
+  activeProperties: number;
+  totalViews: number;
+  totalInquiries: number;
+  statusBreakdown: {
+    draft: number;
+    pending: number;
+    active: number;
+    rejected: number;
+    sold: number;
+    rented: number;
+  };
+}
+
+/**
  * Properties Service
  * Handles all API calls related to property management
  */
@@ -289,6 +307,21 @@ class PropertiesService {
     if (!response.data.success || !response.data.data) {
       throw new Error(
         response.data.message || 'Failed to fetch property types from scraper'
+      );
+    }
+    return response.data.data;
+  }
+
+  /**
+   * Get dashboard statistics for the authenticated user
+   */
+  async getDashboardStats(): Promise<DashboardStats> {
+    const response = await apiClient.get<ApiResponse<DashboardStats>>(
+      `${this.API_PREFIX}/dashboard/stats`
+    );
+    if (!response.data.success || !response.data.data) {
+      throw new Error(
+        response.data.message || 'Failed to fetch dashboard statistics'
       );
     }
     return response.data.data;

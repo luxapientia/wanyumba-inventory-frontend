@@ -10,7 +10,10 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import Button from '../../components/UI/Button.js';
+import propertiesService, { type DashboardStats } from '../../api/properties.service.js';
+import { useToast } from '../../contexts/index.js';
 
 interface StatCardProps {
   title: string;
@@ -89,6 +92,44 @@ function StatCard({
 }
 
 export default function Dashboard() {
+  const [stats, setStats] = useState<DashboardStats>({
+    totalProperties: 0,
+    activeProperties: 0,
+    totalViews: 0,
+    totalInquiries: 0,
+    statusBreakdown: {
+      draft: 0,
+      pending: 0,
+      active: 0,
+      rejected: 0,
+      sold: 0,
+      rented: 0,
+    },
+  });
+  const [loading, setLoading] = useState(true);
+  const toast = useToast();
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        const data = await propertiesService.getDashboardStats();
+        setStats(data);
+      } catch (error) {
+        console.error('Failed to fetch dashboard stats:', error);
+        toast.error(
+          'Failed to Load Stats',
+          error instanceof Error ? error.message : 'Could not load dashboard statistics'
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="min-h-screen p-4 sm:p-6 lg:p-8 space-y-6 bg-gradient-to-br from-gray-50 via-white to-purple-50/30">
       {/* Page Header */}
@@ -117,40 +158,87 @@ export default function Dashboard() {
       </motion.div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatCard
-          title="Total Properties"
-          value={0}
-          change="+12% from last month"
-          icon={Package}
-          gradient="from-sky-500 to-blue-600"
+          title="Active Properties"
+          value={loading ? '...' : stats.activeProperties}
+          icon={TrendingUp}
+          gradient="from-cyan-500 to-teal-600"
           delay={0.1}
         />
         <StatCard
-          title="Active Properties"
-          value={0}
-          change="+5 new this week"
-          icon={TrendingUp}
-          gradient="from-cyan-500 to-teal-600"
+          title="Total Views"
+          value={loading ? '...' : stats.totalViews}
+          icon={Eye}
+          gradient="from-blue-500 to-cyan-600"
           delay={0.2}
         />
         <StatCard
-          title="Total Views"
-          value={0}
-          change="+23% increase"
-          icon={Eye}
-          gradient="from-blue-500 to-cyan-600"
-          delay={0.3}
-        />
-        <StatCard
           title="Inquiries"
-          value={0}
-          change="+8 new messages"
+          value={loading ? '...' : stats.totalInquiries}
           icon={MessageSquare}
           gradient="from-teal-500 to-emerald-600"
-          delay={0.4}
+          delay={0.3}
         />
       </div>
+
+      {/* Status Breakdown */}
+      {stats.statusBreakdown && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-6 hover:shadow-xl transition-shadow duration-300"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">
+              Property Status Breakdown
+            </h2>
+            <Package className="w-5 h-5 text-sky-500" />
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="text-center p-4 bg-gray-50 rounded-xl">
+              <p className="text-2xl font-bold text-gray-900">
+                {loading ? '...' : stats.statusBreakdown.draft}
+              </p>
+              <p className="text-sm text-gray-600 mt-1">Draft</p>
+            </div>
+            <div className="text-center p-4 bg-yellow-50 rounded-xl">
+              <p className="text-2xl font-bold text-yellow-700">
+                {loading ? '...' : stats.statusBreakdown.pending}
+              </p>
+              <p className="text-sm text-gray-600 mt-1">Pending</p>
+            </div>
+            <div className="text-center p-4 bg-green-50 rounded-xl">
+              <p className="text-2xl font-bold text-green-700">
+                {loading ? '...' : stats.statusBreakdown.active}
+              </p>
+              <p className="text-sm text-gray-600 mt-1">Active</p>
+            </div>
+            <div className="text-center p-4 bg-red-50 rounded-xl">
+              <p className="text-2xl font-bold text-red-700">
+                {loading ? '...' : stats.statusBreakdown.rejected}
+              </p>
+              <p className="text-sm text-gray-600 mt-1">Rejected</p>
+            </div>
+            <div className="text-center p-4 bg-blue-50 rounded-xl">
+              <p className="text-2xl font-bold text-blue-700">
+                {loading ? '...' : stats.statusBreakdown.sold}
+              </p>
+              <p className="text-sm text-gray-600 mt-1">Sold</p>
+            </div>
+            <div className="text-center p-4 bg-purple-50 rounded-xl">
+              <p className="text-2xl font-bold text-purple-700">
+                {loading ? '...' : stats.statusBreakdown.rented}
+              </p>
+              <p className="text-sm text-gray-600 mt-1">Rented</p>
+            </div>
+          </div>
+          <p className="text-xs text-gray-500 mt-4 text-center">
+            Total: {loading ? '...' : stats.totalProperties} properties
+          </p>
+        </motion.div>
+      )}
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -158,7 +246,7 @@ export default function Dashboard() {
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.6 }}
           className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-6 hover:shadow-xl transition-shadow duration-300"
         >
           <div className="flex items-center justify-between mb-4">
@@ -190,7 +278,7 @@ export default function Dashboard() {
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.6 }}
+          transition={{ delay: 0.7 }}
           className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-6 hover:shadow-xl transition-shadow duration-300"
         >
           <div className="flex items-center justify-between mb-4">

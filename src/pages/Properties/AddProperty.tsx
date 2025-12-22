@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import Button from '../../components/UI/Button.js';
 import Input from '../../components/UI/Input.js';
+import { VoiceInput } from '../../components/VoiceInput.js';
 import LocationPickerModal, { type LocationInfo } from '../../components/LocationPickerModal.js';
 import { useToast } from '../../contexts/index.js';
 import { useAppDispatch, useAppSelector } from '../../store/hooks.js';
@@ -794,29 +795,33 @@ export default function AddProperty() {
               </div>
 
               <div className="space-y-5">
-                <Input
-                  label="Property Title *"
+                <VoiceInput
+                  label="Property Title"
                   name="title"
-                  value={formData.title}
-                  onChange={handleChange}
+                  value={formData.title || ''}
+                  onChange={(value) => {
+                    setFormData((prev) => ({ ...prev, title: value }));
+                    setError(null);
+                  }}
                   placeholder="e.g., Beautiful 3-bedroom house in Kinondoni"
-                  required
+                  type="input"
                   fullWidth
+                  required
                 />
 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Description
-                  </label>
-                  <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    placeholder="Describe the property in detail..."
-                    rows={4}
-                    className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 bg-white focus:border-sky-500 focus:ring-4 focus:ring-sky-100 transition-all duration-200 focus:outline-none"
-                  />
-                </div>
+                <VoiceInput
+                  label="Description"
+                  name="description"
+                  value={formData.description || ''}
+                  onChange={(value) => {
+                    setFormData((prev) => ({ ...prev, description: value }));
+                    setError(null);
+                  }}
+                  placeholder="Describe the property in detail..."
+                  type="textarea"
+                  rows={4}
+                  fullWidth
+                />
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div className="flex flex-col gap-1.5 min-w-0">
