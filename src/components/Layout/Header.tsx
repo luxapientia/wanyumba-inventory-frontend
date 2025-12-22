@@ -1,25 +1,29 @@
-import { useEffect } from 'react';
-import { Bell, User, Search, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Input } from '../UI/index.js';
-import Button from '../UI/Button.js';
-import { useAppDispatch, useAppSelector } from '../../store/hooks.js';
-import { fetchCurrentUser } from '../../store/thunks/userThunks.js';
+import { useLocation } from 'react-router-dom';
 
 interface HeaderProps {
   onMenuClick: () => void;
 }
 
-const Header = ({ onMenuClick }: HeaderProps) => {
-  const dispatch = useAppDispatch();
-  const { user, loading: userLoading } = useAppSelector((state) => state.user);
+const getPageTitle = (pathname: string): string => {
+  if (pathname === '/' || pathname === '') return 'Dashboard';
+  if (pathname === '/properties') return 'My Properties';
+  if (pathname.includes('/properties/') && pathname.includes('/edit')) return 'Edit Property';
+  if (pathname.includes('/properties/') && !pathname.includes('/edit') && !pathname.includes('/discover-more')) return 'Property Details';
+  if (pathname === '/properties/discover-more') return 'Discover More';
+  if (pathname === '/admin/properties') return 'Manage Properties';
+  if (pathname === '/admin/properties/pending') return 'Pending Approval';
+  if (pathname.includes('/admin/properties/')) return 'Property Details';
+  if (pathname === '/analytics') return 'Analytics';
+  if (pathname === '/settings') return 'Settings';
+  return 'Inventory';
+};
 
-  // Fetch user info on mount
-  useEffect(() => {
-    if (!user && !userLoading) {
-      dispatch(fetchCurrentUser());
-    }
-  }, [dispatch, user, userLoading]);
+const Header = ({ onMenuClick }: HeaderProps) => {
+  const location = useLocation();
+  const pageTitle = getPageTitle(location.pathname);
+
   return (
     <header className="bg-white/80 backdrop-blur-xl border-b border-gray-200/50 px-4 sm:px-6 py-3 sm:py-4 sticky top-0 z-30 shadow-sm">
       <div className="flex items-center justify-between gap-4">
@@ -33,89 +37,15 @@ const Header = ({ onMenuClick }: HeaderProps) => {
           <Menu size={24} className="text-gray-700" />
         </motion.button>
 
-        {/* Search Bar */}
-        <motion.div
-          className="flex-1 max-w-2xl"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
+        {/* Page Title */}
+        <motion.h1
+          className="text-xl sm:text-2xl font-bold text-gray-900 flex-1"
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <div className="relative">
-            <Input
-              type="text"
-              placeholder="Search properties, inventory..."
-              icon={<Search size={18} className="text-gray-400" />}
-              iconPosition="left"
-              fullWidth
-              className="bg-gray-50/50 border-gray-200 focus:bg-white focus:border-sky-400 focus:ring-sky-200"
-            />
-          </div>
-        </motion.div>
-
-        {/* Right Side Actions */}
-        <div className="flex items-center gap-3 flex-shrink-0">
-          {/* Notifications */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="relative p-2.5"
-            aria-label="Notifications"
-          >
-            <Bell size={20} className="text-gray-600" />
-            <motion.span
-              className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-gradient-to-r from-red-500 to-rose-500 rounded-full ring-2 ring-white shadow-lg"
-              animate={{
-                scale: [1, 1.2, 1],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-              }}
-            />
-          </Button>
-
-          {/* User Profile */}
-          <motion.div
-            className="flex items-center gap-2 sm:gap-3 pl-3 border-l border-gray-200"
-            whileHover={{ scale: 1.02 }}
-          >
-            <div className="text-right hidden sm:block">
-              <p className="text-sm font-semibold text-gray-900">
-                {userLoading ? 'Loading...' : user ? (user.firstName || user.lastName ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : user.email.split('@')[0]) : 'User'}
-              </p>
-              <p className="text-xs text-gray-500">
-                {user && user.roles && user.roles.length > 0 
-                  ? user.roles[0].charAt(0).toUpperCase() + user.roles[0].slice(1)
-                  : 'User'}
-              </p>
-            </div>
-            <motion.div
-              className="relative w-10 h-10 bg-gradient-to-br from-sky-600 via-blue-600 to-cyan-600 rounded-full flex items-center justify-center ring-2 ring-gray-200 flex-shrink-0 shadow-lg cursor-pointer overflow-hidden"
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {user?.avatar ? (
-                <img
-                  src={user.avatar}
-                  alt={user.firstName || user.email}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <User size={20} className="text-white" />
-              )}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-br from-sky-400 to-cyan-500 rounded-full"
-                animate={{
-                  opacity: [0.5, 0.8, 0.5],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                }}
-              />
-            </motion.div>
-          </motion.div>
-        </div>
+          {pageTitle}
+        </motion.h1>
       </div>
     </header>
   );

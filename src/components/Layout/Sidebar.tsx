@@ -6,7 +6,6 @@ import {
   TrendingUp,
   Database,
   Compass,
-  Plus,
   X,
 } from 'lucide-react';
 
@@ -32,16 +31,9 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
       label: 'My Properties',
       color: 'from-cyan-500 via-teal-500 to-emerald-600',
       glow: 'rgba(6, 182, 212, 0.3)',
-        },
-        {
-          path: '/properties/new',
-      icon: Plus,
-          label: 'Add Property',
-      color: 'from-emerald-500 via-teal-500 to-cyan-600',
-      glow: 'rgba(16, 185, 129, 0.3)',
-        },
-        {
-          path: '/properties/discover-more',
+    },
+    {
+      path: '/properties/discover-more',
       icon: Compass,
           label: 'Discover More',
       color: 'from-blue-500 via-indigo-500 to-purple-600',
@@ -63,19 +55,18 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
     }
     
     // For /properties, it should match /properties and /properties/:id and /properties/:id/edit
-    // But NOT /properties/new or /properties/discover-more
+    // But NOT /properties/discover-more
     if (item.path === '/properties') {
-    return (
+      return (
         currentPath === '/properties' ||
         (currentPath.startsWith('/properties/') && 
-         !currentPath.startsWith('/properties/new') &&
          !currentPath.startsWith('/properties/discover-more'))
       );
     }
     
-    // For specific paths like /properties/new and /properties/discover-more
+    // For specific paths like /properties/discover-more
     // Only match exact path or paths that start with it followed by /
-    if (item.path === '/properties/new' || item.path === '/properties/discover-more') {
+    if (item.path === '/properties/discover-more') {
       return currentPath === item.path || currentPath.startsWith(`${item.path}/`);
     }
     
