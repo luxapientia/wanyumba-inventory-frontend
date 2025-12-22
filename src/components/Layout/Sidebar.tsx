@@ -54,11 +54,12 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
       return true;
     }
     
-    // For /properties, it should match /properties and /properties/:id and /properties/:id/edit
+    // For /properties, it should match /properties, /properties/new, /properties/:id, and /properties/:id/edit
     // But NOT /properties/discover-more
     if (item.path === '/properties') {
       return (
         currentPath === '/properties' ||
+        currentPath === '/properties/new' ||
         (currentPath.startsWith('/properties/') && 
          !currentPath.startsWith('/properties/discover-more'))
       );

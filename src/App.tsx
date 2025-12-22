@@ -4,6 +4,7 @@ import ToastContainer from './components/Toast/ToastContainer';
 import { Layout } from './components/Layout';
 import { Dashboard } from './pages/Dashboard';
 import { Properties } from './pages/Properties';
+import AddProperty from './pages/Properties/AddProperty';
 import DiscoverMore from './pages/Properties/DiscoverMore';
 import EditProperty from './pages/Properties/EditProperty';
 import PropertyDetail from './pages/Properties/PropertyDetail';
@@ -20,6 +21,7 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
             <Route path="properties" element={<Properties />} />
+            <Route path="properties/new" element={<AddProperty />} />
             <Route path="properties/:id/edit" element={<EditProperty />} />
             <Route path="properties/:id" element={<PropertyDetail />} />
             <Route path="properties/discover-more" element={<DiscoverMore />} />
