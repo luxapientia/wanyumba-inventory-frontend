@@ -11,6 +11,7 @@ import PropertyDetail from './pages/Properties/PropertyDetail';
 import { ManageProperties, PendingApproval, AdminPropertyDetail } from './pages/Admin';
 import { Analytics } from './pages/Analytics';
 import { Settings } from './pages/Settings';
+import { ChatButton } from './components/Chat/ChatButton';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
           </Route>
         </Routes>
         <ToastContainer />
+        <ChatButton />
       </BrowserRouter>
     </ToastProvider>
   );

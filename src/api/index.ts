@@ -5,6 +5,7 @@ export { default as geocodingService } from './geocoding.service.js';
 export { default as listingsService } from './properties.service.js';
 export * from './types.js';
 export * from './speechToTextService.js';
+export * from './chatService.js';
 export type {
   GeocodingResult,
   ForwardGeocodingRequest,

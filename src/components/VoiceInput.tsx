@@ -50,11 +50,6 @@ export const VoiceInput = forwardRef<HTMLInputElement | HTMLTextAreaElement, Voi
       },
     });
 
-    const baseInputClasses = 'w-full rounded-xl border-2 border-gray-200 bg-white focus:border-sky-500 focus:ring-4 focus:ring-sky-100 transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed';
-    const inputClasses = type === 'textarea' 
-      ? `${baseInputClasses} px-4 py-2.5 resize-none`
-      : `${baseInputClasses} px-4 py-2.5`;
-
     return (
       <div className={`flex flex-col gap-1.5 ${fullWidth ? 'w-full' : ''} ${className || ''}`}>
         {label && (
@@ -64,9 +59,9 @@ export const VoiceInput = forwardRef<HTMLInputElement | HTMLTextAreaElement, Voi
           </label>
         )}
         
-        <div className={`relative w-full rounded-xl border-2 border-gray-200 bg-white focus-within:border-sky-500 focus-within:ring-4 focus-within:ring-sky-100 transition-all duration-200 ${
+        <div className={`relative w-full rounded-md border border-gray-300 bg-white focus-within:ring-2 focus-within:ring-sky-500 focus-within:ring-offset-2 transition-all duration-200 ${
           type === 'textarea' ? 'flex flex-col' : 'flex items-center gap-2'
-        } ${error ? 'border-red-500 focus-within:border-red-500 focus-within:ring-red-100' : ''}`}>
+        } ${error ? 'border-red-500 focus-within:border-red-500 focus-within:ring-red-500' : ''}`}>
           {type === 'textarea' ? (
             <>
               <textarea
@@ -78,7 +73,7 @@ export const VoiceInput = forwardRef<HTMLInputElement | HTMLTextAreaElement, Voi
                 onKeyDown={onKeyDown}
                 onBlur={onBlur}
                 placeholder={placeholder}
-                className={`${inputClasses} border-0 focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none flex-1`}
+                className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none flex-1 resize-none px-3 py-2 text-sm rounded-md focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={disabled || isTranscribing}
                 rows={rows}
               />
@@ -118,7 +113,7 @@ export const VoiceInput = forwardRef<HTMLInputElement | HTMLTextAreaElement, Voi
                 onKeyDown={onKeyDown}
                 onBlur={onBlur}
                 placeholder={placeholder}
-                className={`${inputClasses} border-0 focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none flex-1`}
+                className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none flex-1 px-3 py-2 text-sm rounded-md focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={disabled || isTranscribing}
                 required={required}
               />
